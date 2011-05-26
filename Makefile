@@ -1,13 +1,19 @@
-.PHONY: all profile vim
+RC := $(HOME)/.rc
 
-all: profile vim
+.PHONY: all profile vim gdbinit
+
+all: profile vim gdbinit
 
 profile:
 	rm -rf $(HOME)/.profile
-	ln -s $(HOME)/.rc/profile $(HOME)/.profile
+	ln -s $(RC)/profile $(HOME)/.profile
 
 vim:
 	rm -rf $(HOME)/.vim
 	rm -rf $(HOME)/.vimrc
-	ln -s $(HOME)/.rc/vim $(HOME)/.vim
-	ln -s $(HOME)/.rc/vimrc $(HOME)/.vimrc
+	ln -s $(RC)/vim $(HOME)/.vim
+	ln -s $(RC)/vimrc $(HOME)/.vimrc
+
+gdbinit:
+	rm -rf $(HOME)/.gdbinit
+	ln -s $(RC)/gdbinit $(HOME)/.gdbinit
