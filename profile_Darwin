@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#
+# Paths etc
+#
+
+export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+
+#
+# Chromium/WebKit
+#
+
+alias rs=run-safari
+alias bcr='xcodebuild -project chrome/chrome.xcodeproj -configuration Debug -target chrome'
+alias rcr=xcodebuild/Debug/Chromium.app/Contents/MacOS/Chromium
