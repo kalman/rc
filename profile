@@ -14,7 +14,11 @@ esac
 # Paths etc
 #
 
-export PS1="\[\033[36m\]\w\[\033[00m\] "
+# Mac gets crappy hostname sometimes.
+__hostname() {
+  hostname -s | sed -E 's/dhcp-(.*)$/mac/'
+}
+export PS1='\[\033[01;32m\]$(__hostname)\[\033[01;34m\] \w\[\033[31m\]$(__git_ps1 "(%s)") \[\033[00m\]'
 
 export GOROOT="$HOME/local/go"
 export EDITOR="vim"
