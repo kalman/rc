@@ -12,9 +12,11 @@ set number
 set ruler
 set tags=tags
 set smarttab
+set tabstop=2
 set shiftwidth=2
 set softtabstop=2
 set expandtab
+set backspace=indent,eol,start
 
 map j gj
 map k gk

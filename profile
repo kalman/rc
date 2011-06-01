@@ -36,7 +36,7 @@ alias lla='ls -lA'
 alias v=vim
 alias vp='vim -p'
 alias wg='wget --no-check-certificate -O-'
-alias grr="grep -rn --color=auto --exclude-dir='.svn'"
+alias grr="grep -rn --color=auto --exclude='.svn'"
 alias s="screen -DR"
 alias prepend='sed "s|^|$1"'
 
