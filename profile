@@ -68,8 +68,8 @@ unmerged() {
 # Chromium/WebKit
 #
 
-alias cdw="cd $HOME/src/chromium/src/third_party/WebKit"
-alias cdc="cd $HOME/src/chromium/src"
+alias cdw="cd $HOME/chromium/third_party/WebKit"
+alias cdc="cd $HOME/chromium"
 alias bw=build-webkit
 alias rwt=run-webkit-tests
 alias nrwt=new-run-webkit-tests
@@ -83,5 +83,5 @@ wkup() {
 }
 
 crup() {
-  git pull && gclient sync
+  git pull && gclient sync --jobs=32
 }
