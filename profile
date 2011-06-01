@@ -66,6 +66,8 @@ alias gitchm="git checkout master"
 alias gitdnm="git diff --numstat master"
 alias gitdns="git diff --name-status"
 
+complete -o default -o nospace -F _git_checkout gitch
+
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
 }
