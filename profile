@@ -14,7 +14,11 @@ esac
 # Paths etc
 #
 
-export PS1="\[\033[36m\]\w\[\033[00m\] "
+# Mac gets crappy hostname sometimes.
+__hostname() {
+  hostname -s | sed -E 's/dhcp-(.*)$/mac/'
+}
+export PS1='\[\033[01;32m\]$(__hostname)\[\033[01;34m\] \w\[\033[31m\]$(__git_ps1 "(%s)") \[\033[00m\]'
 
 export GOROOT="$HOME/local/go"
 export EDITOR="vim"
@@ -36,13 +40,15 @@ alias lla='ls -lA'
 alias v=vim
 alias vp='vim -p'
 alias wg='wget --no-check-certificate -O-'
-alias grr="grep -rn --color=auto --exclude-dir='.svn'"
+alias grr="grep -rn --color=auto --exclude='.svn'"
 alias s="screen -DR"
 alias prepend='sed "s|^|$1"'
 
 #
 # Git
 #
+
+source "$HOME/.rc/git_completion"
 
 alias gitch="git checkout"
 alias gitb="git branch"
