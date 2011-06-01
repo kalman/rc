@@ -33,6 +33,8 @@ alias grr="grep -rn --color=auto"
 # Git
 #
 
+source "$HOME/.rc/git_completion"
+
 alias gitch="git checkout"
 alias gitb="git branch"
 alias gitd="git diff"
