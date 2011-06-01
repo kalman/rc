@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+#
+# Platform specific (first because some stuff in here relies on it)
+#
+
+case `uname` in
+  Darwin) source $HOME/.rc/profile_Darwin ;;
+  Linux)  source $HOME/.rc/profile_Linux ;;
+esac
+
 #
 # Paths etc
 #
@@ -19,7 +29,6 @@ export PATH="$GOROOT/bin:$PATH"
 #
 
 alias fn='find . -name'
-alias ls='ls -G'
 alias l=ls
 alias ll='ls -l'
 alias la='ls -A'
@@ -27,7 +36,9 @@ alias lla='ls -lA'
 alias v=vim
 alias vp='vim -p'
 alias wg='wget --no-check-certificate -O-'
-alias grr="grep -rn --color=auto"
+alias grr="grep -rn --color=auto --exclude-dir='.svn'"
+alias s="screen -DR"
+alias prepend='sed "s|^|$1"'
 
 #
 # Git
@@ -63,15 +74,16 @@ alias cdw="cd $HOME/src/chromium/src/third_party/WebKit"
 alias cdc="cd $HOME/src/chromium/src"
 alias bw=build-webkit
 alias rwt=run-webkit-tests
+alias nrwt=new-run-webkit-tests
 alias lkgr='curl http://chromium-status.appspot.com/lkgr'
 alias rl=run-launder
 alias pc='prepare-ChangeLog --merge-base `git merge-base master HEAD`'
 
-#
-# Platform specific
-#
+wkup() {
+  git fetch && git svn rebase
+  # && update-webkit --chromium
+}
 
-case `uname` in
-  Darwin) source $HOME/.rc/profile_Darwin ;;
-  Linux)  source $HOME/.rc/profile_Linux ;;
-esac
+crup() {
+  git pull && gclient sync
+}

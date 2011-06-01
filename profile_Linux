@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#
+# General
+#
+
+alias ls="ls --color"
