@@ -44,6 +44,8 @@ alias prepend='sed "s|^|$1"'
 # Git
 #
 
+source "$HOME/.rc/git_completion"
+
 alias gitch="git checkout"
 alias gitb="git branch"
 alias gitd="git diff"
