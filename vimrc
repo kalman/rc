@@ -22,3 +22,6 @@ map j gj
 map k gk
 map ^ g^
 map $ g$
+
+" Taken from :help [I
+map <F4> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
