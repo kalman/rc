@@ -27,36 +27,33 @@ map $ g$
 map <F4> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 
 "
-" Taken from koz
+" For switching between .cc and .h files.
+" Taken from koz.
 "
-function! Tocc(fn)
-  return substitute(a:fn, "\.h$", ".cc", "")
+fu! SetSuffix(fn, suffix)
+    return substitute(a:fn, "\\..*$", "." . a:suffix, "")
 endfunction
 
-function! Toh(fn)
-  return substitute(a:fn, "\.cc$", ".h", "")
+fu! GetOther(fn)
+    if a:fn =~ "\\.h$"
+        let s:cc = SetSuffix(a:fn, "cc")
+        let s:cpp = SetSuffix(a:fn, "cpp")
+        if filereadable(s:cc)
+            return s:cc
+        elseif filereadable(s:cpp)
+            return s:cpp
+        endif
+    elseif a:fn =~ "\\.cc$" || a:fn =~ "\.cpp"
+        return SetSuffix(a:fn, "h")
+    endif
+    return 1
 endfunction
 
-function! GetOther(fn)
-  if a:fn =~ "\.h$"
-    return Tocc(a:fn)
-    "if filereadable(Tocc(a:fn))
-    "    return Tocc(a:fn)
-    "endif
-  elseif a:fn =~ "\.cc$"
-    return Toh(a:fn)
-    "if filereadable(Toh(a:fn))
-    "    return Toh(a:fn)
-    "endif
-  endif
-  return 1
+fu! Switch()
+    let s:temp = GetOther(expand("%"))
+    if s:temp != 1
+        exe ":e " . s:temp
+    endif
 endfunction
 
-function! Switch()
-  let s:temp = GetOther(expand("%"))
-  if s:temp != 1
-    exe ":e " . GetOther(expand("%"))
-  endif
-endfunction
-
-map <F5> :call Switch()<CR>
+map _ :call Switch()<CR>

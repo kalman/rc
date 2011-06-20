@@ -39,6 +39,7 @@ alias la='ls -A'
 alias lla='ls -lA'
 alias v=vim
 alias vp='vim -p'
+alias vs='vim -S'
 alias wg='wget --no-check-certificate -O-'
 alias grr="grep -rn --color=auto --exclude='.svn'"
 alias s="screen -DR"
@@ -72,6 +73,10 @@ unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
 }
 
+gitcb() {
+  gitb | grep '^*' | cut -f2- -d' '
+}
+
 #
 # Chromium/WebKit
 #
@@ -91,5 +96,37 @@ wkup() {
 }
 
 crup() {
-  git pull && gclient sync --jobs=32
+  old_dir=`pwd`
+
+  cdc
+  if [ `gitcb` != trunk ]; then
+    echo 'ERROR: Chromium not on trunk.  Exiting.'
+    exit 1
+  fi
+
+  cdw
+  if [ `gitcb` != gclient ]; then
+    echo 'ERROR: WebKit not on gclient.  Exiting.'
+    exit 1
+  fi
+
+  cdc
+  echo; echo "Updating Chromium..."
+  git pull
+
+  lkgr=`lkgr 2>/dev/null`
+  git_lkgr=`gitl --grep=src@${lkgr} | head -n1 | cut -f2- -d' '`
+  echo; echo "Resetting to lkgr $git_lkgr ($lkgr)..."
+  git reset --hard "$git_lkgr"
+
+  echo; echo "Syncing non-WebKit deps..."
+  gclient sync --jobs=32
+
+  echo; echo "Syncing WebKit..."
+  tools/sync-webkit-git.py
+  cdw
+  git reset --hard
+
+  echo; echo "Done."
+  cd "$old_dir"
 }
