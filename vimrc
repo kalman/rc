@@ -1,7 +1,6 @@
 syntax on
 filetype indent on
 filetype plugin on
-"colorscheme ben
 colorscheme koehler
 
 set autoindent
@@ -22,9 +21,11 @@ map j gj
 map k gk
 map ^ g^
 map $ g$
+map gr gT
+map m :cnext<CR>
 
 " Taken from :help [I
-map <F4> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
+map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 
 "
 " For switching between .cc and .h files.
