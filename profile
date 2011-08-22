@@ -161,7 +161,12 @@ crsync() {
   fi
   host="$1"
 
-  rsync -azC $host:chromium .
+  old_dir=$PWD
+  cdc
+  cd chrome
+  rsync -avzC $host:chromium/chrome/ .
+  rsync -avzC $host:chromium/net/ .
+  cd $old_dir
 }
 
 po() {
