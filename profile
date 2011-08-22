@@ -115,13 +115,17 @@ crup() {
   echo; echo "Updating Chromium..."
   git pull
 
-  lkgr=`lkgr 2>/dev/null`
-  git_lkgr=`gitl --grep=src@${lkgr} | head -n1 | cut -f2- -d' '`
-  echo; echo "Resetting to lkgr $git_lkgr ($lkgr)..."
-  git reset --hard "$git_lkgr"
+  if [ -n "$1" ]; then
+    version="$1"
+  else
+    lkgr=`lkgr 2>/dev/null`
+    version=`gitl --grep=src@$lkgr | head -n1 | cut -f2- -d' '`
+  fi
+  echo; echo "Resetting to $version"
+  git reset --hard "$version"
 
   echo; echo "Syncing non-WebKit deps..."
-  gclient sync --jobs=32
+  gclient sync --force --jobs=32
 
   echo; echo "Syncing WebKit..."
   cdw
@@ -133,6 +137,45 @@ crup() {
 
   echo; echo "Done."
   cd "$old_dir"
+}
+
+crpatch() {
+  # TODO: make sure there are no changes between this branch and origin/trunk
+
+  if [ -z "$1" ]; then
+    echo "Usage: crpatch HOST [BRANCH]"
+    return 1
+  fi
+  host="$1"
+
+  if [ -n "$2" ]; then
+    branch="$2"
+  else
+    branch=`ssh $host "cd chromium; git symbolic-ref HEAD"`
+    branch="${branch##refs/heads/}"
+  fi
+
+  version=`ssh $host "cd chromium; git merge-base $branch origin/trunk"`
+  crup $version
+
+  echo; echo "Patching changes from $branch..."
+  ssh $host "cd chromium; git diff $version" | patch -p1
+  echo; echo "Done."
+}
+
+crsync() {
+  if [ -z "$1" ]; then
+    echo "Usage: crpatch HOST"
+    return 1
+  fi
+  host="$1"
+
+  old_dir=$PWD
+  cdc
+  cd chrome
+  rsync -avzC $host:chromium/chrome/ .
+  rsync -avzC $host:chromium/net/ .
+  cd $old_dir
 }
 
 po() {
