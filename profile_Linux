@@ -5,3 +5,10 @@
 #
 
 alias ls="ls --color"
+
+#
+# Chromium/WebKit
+#
+
+alias bcr='make -j24 out/Debug/chrome'
+alias rcr=out/Debug/chrome

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #
 # Platform specific (first because some stuff in here relies on it)
 #
@@ -66,11 +65,18 @@ alias gita="git add"
 alias gitchm="git checkout master"
 alias gitdnm="git diff --numstat master"
 alias gitdns="git diff --name-status"
+alias gitlf="git ls-files"
+alias gitmb="git merge-base"
 
 complete -o default -o nospace -F _git_checkout gitch
 
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
+}
+
+changed() {
+  branch=`gitcb`
+  gitdns `gitmb $branch origin/trunk` | cut -f2
 }
 
 gitcb() {
@@ -118,6 +124,9 @@ crup() {
   gclient sync --jobs=32
 
   echo; echo "Syncing WebKit..."
+  cdw
+  git pull origin master
+  cdc
   tools/sync-webkit-git.py
   cdw
   git reset --hard

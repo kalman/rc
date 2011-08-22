@@ -23,6 +23,8 @@ map ^ g^
 map $ g$
 map gr gT
 map m :cnext<CR>
+map t :tabe 
+map gF :tabe <cfile><CR>
 
 " Taken from :help [I
 map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
@@ -32,7 +34,7 @@ map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 " Taken from koz.
 "
 fu! SetSuffix(fn, suffix)
-    return substitute(a:fn, "\\..*$", "." . a:suffix, "")
+    return substitute(a:fn, "\\.[^.]*$", "." . a:suffix, "")
 endfunction
 
 fu! GetOther(fn)
@@ -44,7 +46,7 @@ fu! GetOther(fn)
         elseif filereadable(s:cpp)
             return s:cpp
         endif
-    elseif a:fn =~ "\\.cc$" || a:fn =~ "\.cpp"
+    elseif a:fn =~ "\\.cc$" || a:fn =~ "\\.cpp"
         return SetSuffix(a:fn, "h")
     endif
     return 1
