@@ -174,6 +174,7 @@ crsync() {
   cdc
   cd chrome
   rsync -avzC $host:chromium/chrome/ .
+  cd ../net
   rsync -avzC $host:chromium/net/ .
   cd $old_dir
 }

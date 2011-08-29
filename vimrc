@@ -25,6 +25,8 @@ map gr gT
 map m :cnext<CR>
 map t :tabe 
 map gF :tabe <cfile><CR>
+map q Gyy<c-o>p
+map Q Gyy<c-o>P
 
 " Taken from :help [I
 map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>

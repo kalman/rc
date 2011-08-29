@@ -11,4 +11,6 @@ alias ls="ls --color"
 #
 
 alias bcr='make -j24 out/Debug/chrome'
+alias bct='make -j24 out/Debug/browser_tests'
 alias rcr=out/Debug/chrome
+alias rct=out/Debug/browser_tests
