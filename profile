@@ -125,7 +125,7 @@ crup() {
   git reset --hard "$version"
 
   echo; echo "Syncing non-WebKit deps..."
-  gclient sync --force --jobs=32
+  gclient sync -fDj 32
 
   echo; echo "Syncing WebKit..."
   cdw
