@@ -171,11 +171,21 @@ crsync() {
   host="$1"
 
   old_dir=$PWD
-  cdc
-  cd chrome
-  rsync -avzC $host:chromium/chrome/ .
-  cd ../net
-  rsync -avzC $host:chromium/net/ .
+  for dir in chrome net; do
+    cdc
+    cd $dir
+    rsync -avzC \
+      --include '*.cc' \
+      --include '*.cpp' \
+      --include '*.gyp' \
+      --include '*.gypi' \
+      --include '*.h' \
+      --include '*.html' \
+      --include '*.js' \
+      --include '*.proto' \
+      --include '*.py' \
+      $host:chromium/$dir/ .
+  done
   cd $old_dir
 }
 
