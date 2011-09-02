@@ -41,13 +41,13 @@ endfunction
 
 fu! GetOther(fn)
     if a:fn =~ "\\.h$"
-        let s:cc = SetSuffix(a:fn, "cc")
+        " Attempt to open any WebKit cpp file.
         let s:cpp = SetSuffix(a:fn, "cpp")
-        if filereadable(s:cc)
-            return s:cc
-        elseif filereadable(s:cpp)
+        if filereadable(s:cpp)
             return s:cpp
         endif
+        " Default to opening a (possibly new) .cc file.
+        return SetSuffix(a:fn, "cc")
     elseif a:fn =~ "\\.cc$" || a:fn =~ "\\.cpp"
         return SetSuffix(a:fn, "h")
     endif
