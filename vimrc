@@ -17,16 +17,20 @@ set softtabstop=2
 set expandtab
 set backspace=indent,eol,start
 
-map j gj
-map k gk
-map ^ g^
-map $ g$
+"map j gj
+"map k gk
+"map ^ g^
+"map $ g$
 map gr gT
 map m :cnext<CR>
+map e :e 
 map t :tabe 
 map gF :tabe <cfile><CR>
 map q Gyy<c-o>p
 map Q Gyy<c-o>P
+map & *<c-o>
+map XX :qa<cr>
+map XQ :qa!<cr>
 
 " Taken from :help [I
 map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>

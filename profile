@@ -23,6 +23,7 @@ export GOROOT="$HOME/local/go"
 export EDITOR="vim"
 export SVN_LOG_EDITOR="$EDITOR"
 
+export PATH="$HOME/local/bin:$PATH"
 export PATH="$HOME/local/depot_tools:$PATH"
 export PATH="$HOME/src/chromium/src/third_party/WebKit/Tools/Scripts:$PATH"
 export PATH="$GOROOT/bin:$PATH"
@@ -32,6 +33,8 @@ export PATH="$GOROOT/bin:$PATH"
 #
 
 alias fn='find . -name'
+alias cd='cd -P'
+alias c=cd
 alias l=ls
 alias ll='ls -l'
 alias la='ls -A'
@@ -44,43 +47,54 @@ alias grr="grep -rn --color=auto --exclude='.svn'"
 alias s="screen -DR"
 alias prepend='sed "s|^|$1"'
 
+vl() {
+  file=`echo "$1" | cut -d: -f1`
+  line=`echo "$1" | cut -d: -f2`
+  v "$file" +"$line"
+}
+
 #
 # Git
 #
 
 source "$HOME/.rc/git_completion"
 
-alias gitch="git checkout"
-alias gitb="git branch"
-alias gitd="git diff"
-alias gits="git status"
-alias gitc="git commit"
-alias gitst="git status"
-alias gitl="git log"
-alias gitr="git rebase"
-alias gitp="git pull"
-alias gitls="git ls-files"
-alias gitm="git merge"
-alias gita="git add"
-alias gitchm="git checkout master"
-alias gitdnm="git diff --numstat master"
-alias gitdns="git diff --name-status"
-alias gitlf="git ls-files"
-alias gitmb="git merge-base"
+alias g="git"
+alias gch="git checkout"
+alias gb="git branch"
+alias gd="git diff"
+alias gs="git status"
+alias gc="git commit"
+alias gst="git status"
+alias gl="git log"
+alias gr="git rebase"
+alias gp="git pull"
+alias gls="git ls-files"
+alias gm="git merge"
+alias ga="git add"
+alias gchm="git checkout master"
+alias gdnm="git diff --numstat master"
+alias gdns="git diff --name-status"
+alias glf="git ls-files"
+alias gmb="git merge-base"
 
-complete -o default -o nospace -F _git_checkout gitch
+complete -o default -o nospace -F _git_checkout gc
 
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
 }
 
-changed() {
-  branch=`gitcb`
-  gitdns `gitmb $branch origin/trunk` | cut -f2
+gcb() {
+  gb | grep '^*' | cut -f2- -d' '
 }
 
-gitcb() {
-  gitb | grep '^*' | cut -f2- -d' '
+gbase() {
+  branch=`gcb`
+  gmb $branch origin/trunk
+}
+
+changed() {
+  gdns `gbase` | cut -f2
 }
 
 #
@@ -105,9 +119,8 @@ crup() {
   old_dir=`pwd`
 
   cdw
-  if [ `gitcb` != gclient ]; then
-    echo 'ERROR: WebKit not on gclient.'
-    return
+  if [ `gcb` != gclient ]; then
+    echo 'WARNING: WebKit not on gclient.  It will not be synced.'
   fi
 
   cdc
@@ -119,7 +132,7 @@ crup() {
     version="$1"
   else
     lkgr=`lkgr 2>/dev/null`
-    version=`gitl --grep=src@$lkgr | head -n1 | cut -f2- -d' '`
+    version=`gl --grep=src@$lkgr | head -n1 | cut -f2- -d' '`
   fi
   echo; echo "Resetting to $version"
   git reset --hard "$version"
@@ -127,13 +140,15 @@ crup() {
   echo; echo "Syncing non-WebKit deps..."
   gclient sync -fDj 32
 
-  echo; echo "Syncing WebKit..."
-  cdw
-  git pull origin master
-  cdc
-  tools/sync-webkit-git.py
-  cdw
-  git reset --hard
+  if [ `gcb` == gcilent ]; then
+    echo; echo "Syncing WebKit..."
+    cdw
+    git pull origin master
+    cdc
+    tools/sync-webkit-git.py
+    cdw
+    git reset --hard
+  fi
 
   echo; echo "Done."
   cd "$old_dir"
