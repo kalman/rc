@@ -18,4 +18,6 @@ alias ls='ls -G'
 
 alias rs=run-safari
 alias bcr='xcodebuild -project chrome/chrome.xcodeproj -configuration Debug -target chrome'
+alias bct='xcodebuild -project chrome/chrome.xcodeproj -configuration Debug -target browser_tests'
 alias rcr=xcodebuild/Debug/Chromium.app/Contents/MacOS/Chromium
+alias rct=xcodebuild/Debug/browser_tests
