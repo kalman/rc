@@ -43,7 +43,8 @@ alias v=vim
 alias vp='vim -p'
 alias vs='vim -S'
 alias wg='wget --no-check-certificate -O-'
-alias grr="grep -rn --color=auto --exclude='.svn'"
+alias grep='grep --color'
+alias grr="grep -rn --color --exclude='.svn'"
 alias s="screen -DR"
 alias prepend='sed "s|^|$1"'
 
@@ -77,8 +78,11 @@ alias gdnm="git diff --numstat master"
 alias gdns="git diff --name-status"
 alias glf="git ls-files"
 alias gmb="git merge-base"
+alias gg="git grep"
 
-complete -o default -o nospace -F _git_checkout gc
+complete -o default -o nospace -F _git_checkout gch
+complete -o default -o nospace -F _git_branch gb
+complete -o default -o nospace -F _git_rebase gr
 
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
