@@ -31,6 +31,9 @@ map Q Gyy<c-o>P
 map & *<c-o>
 map XX :qa<cr>
 map XQ :qa!<cr>
+map <c-j> <c-e>
+map <c-k> <c-y>
+map \ :noh<cr>
 
 " Taken from :help [I
 map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
