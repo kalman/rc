@@ -28,6 +28,8 @@ map t :tabe
 map gF :tabe <cfile><CR>
 map q Gyy<c-o>p
 map Q Gyy<c-o>P
+map qq yyp
+map qq yyP
 map & *<c-o>
 map XX :qa<cr>
 map XQ :qa!<cr>

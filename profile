@@ -80,8 +80,12 @@ alias glf="git ls-files"
 alias gmb="git merge-base"
 alias gg="git grep"
 
-complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_branch gb
+complete -o default -o nospace -F _git_checkout gch
+complete -o default -o nospace -F _git_diff gd
+complete -o default -o nospace -F _git_diff gdns
+complete -o default -o nospace -F _git_merge_base gmb
+complete -o default -o nospace -F _git_log gl
 complete -o default -o nospace -F _git_rebase gr
 
 unmerged() {
@@ -144,9 +148,9 @@ crup() {
   echo; echo "Syncing non-WebKit deps..."
   gclient sync -fDj 32
 
-  if [ `gcb` == gcilent ]; then
+  cdw
+  if [ `gcb` == gclient ]; then
     echo; echo "Syncing WebKit..."
-    cdw
     git pull origin master
     cdc
     tools/sync-webkit-git.py
