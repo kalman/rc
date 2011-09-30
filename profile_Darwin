@@ -4,13 +4,19 @@
 # Paths etc
 #
 
-export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
 #
 # General
 #
 
 alias ls='ls -G'
+
+#
+# Git
+#
+
+alias gnwd='bash /opt/local/share/doc/git-core/contrib/workdir/git-new-workdir'
 
 #
 # Chromium/WebKit

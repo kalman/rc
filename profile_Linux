@@ -7,6 +7,12 @@
 alias ls="ls --color"
 
 #
+# Git
+#
+
+alias gnwd="bash /usr/share/doc/git/contrib/workdir/git-new-workdir"
+
+#
 # Chromium/WebKit
 #
 

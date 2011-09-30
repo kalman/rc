@@ -25,7 +25,6 @@ export SVN_LOG_EDITOR="$EDITOR"
 
 export PATH="$HOME/local/bin:$PATH"
 export PATH="$HOME/local/depot_tools:$PATH"
-export PATH="$HOME/src/chromium/src/third_party/WebKit/Tools/Scripts:$PATH"
 export PATH="$GOROOT/bin:$PATH"
 
 #
@@ -39,8 +38,8 @@ alias l=ls
 alias ll='ls -l'
 alias la='ls -A'
 alias lla='ls -lA'
-alias v=vim
-alias vp='vim -p'
+alias v='vim -p'
+alias vp=v
 alias vs='vim -S'
 alias wg='wget --no-check-certificate -O-'
 alias grep='grep --color'
@@ -76,6 +75,7 @@ alias ga="git add"
 alias gchm="git checkout master"
 alias gdnm="git diff --numstat master"
 alias gdns="git diff --name-status"
+alias gds="git diff --stat"
 alias glf="git ls-files"
 alias gmb="git merge-base"
 alias gg="git grep"
@@ -84,12 +84,17 @@ complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_diff gd
 complete -o default -o nospace -F _git_diff gdns
+complete -o default -o nospace -F _git_diff gds
 complete -o default -o nospace -F _git_merge_base gmb
 complete -o default -o nospace -F _git_log gl
 complete -o default -o nospace -F _git_rebase gr
 
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
+}
+
+gC() {
+  gc -m `gcb` $@
 }
 
 gcb() {
@@ -102,7 +107,11 @@ gbase() {
 }
 
 changed() {
-  gdns `gbase` | cut -f2
+  base="$1"
+  if [ -z "$base" ]; then
+    base=`gbase`
+  fi
+  gdns "$base" | cut -f2
 }
 
 #
@@ -110,13 +119,16 @@ changed() {
 #
 
 alias cdw="cd $HOME/chromium/third_party/WebKit"
-alias cdc="cd $HOME/chromium"
 alias bw=build-webkit
 alias rwt=run-webkit-tests
 alias nrwt=new-run-webkit-tests
 alias lkgr='curl http://chromium-status.appspot.com/lkgr'
 alias rl=run-launder
 alias pc='prepare-ChangeLog --merge-base `git merge-base master HEAD`'
+
+cdc() {
+  cd "${HOME}/chromium${1}"
+}
 
 wkup() {
   git fetch && git svn rebase
