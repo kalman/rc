@@ -1,8 +1,8 @@
 RC := $(HOME)/.rc
 
-.PHONY: all profile vim gdbinit gitconfig
+.PHONY: all profile vim gdbinit gitconfig rc_scripts
 
-all: profile vim gdbinit
+all: profile vim gdbinit gitconfig rc_scripts
 
 profile:
 	rm -f $(HOME)/.profile
@@ -21,3 +21,7 @@ gdbinit:
 gitconfig:
 	rm -f $(HOME)/.gitconfig
 	ln -s $(RC)/gitconfig $(HOME)/.gitconfig
+
+rc_scripts:
+	rm -f $(HOME)/local/rc_scripts
+	ln -s $(RC)/scripts $(HOME)/local/rc_scripts

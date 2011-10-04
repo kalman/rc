@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "$HOME/.rc/scripts/crbuild"
+
+export GYP_GENERATORS=make
+export GYP_DEFINES="remove_webcore_debug_symbols=1 fastbuild=1"
+do_build "$@"

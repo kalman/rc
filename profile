@@ -24,6 +24,7 @@ export EDITOR="vim"
 export SVN_LOG_EDITOR="$EDITOR"
 
 export PATH="$HOME/local/bin:$PATH"
+export PATH="$HOME/local/rc_scripts:$PATH"
 export PATH="$HOME/local/depot_tools:$PATH"
 export PATH="$GOROOT/bin:$PATH"
 
@@ -118,7 +119,6 @@ changed() {
 # Chromium/WebKit
 #
 
-alias cdw="cd $HOME/chromium/third_party/WebKit"
 alias bw=build-webkit
 alias rwt=run-webkit-tests
 alias nrwt=new-run-webkit-tests
@@ -126,8 +126,13 @@ alias lkgr='curl http://chromium-status.appspot.com/lkgr'
 alias rl=run-launder
 alias pc='prepare-ChangeLog --merge-base `git merge-base master HEAD`'
 
+export CRDIR="$HOME/chromium"
 cdc() {
-  cd "${HOME}/chromium${1}"
+  cd "${CRDIR}${1}"
+}
+export WKDIR="$HOME/chromium/third_party/WebKit"
+cdw() {
+  cd "$WKDIR"
 }
 
 wkup() {
