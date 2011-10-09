@@ -4,19 +4,10 @@
 # General
 #
 
-alias ls="ls --color"
+l() { ls --color "$@"; }
 
 #
 # Git
 #
 
-alias gnwd="bash /usr/share/doc/git/contrib/workdir/git-new-workdir"
-
-#
-# Chromium/WebKit
-#
-
-alias bcr='make -j24 out/Debug/chrome'
-alias bct='make -j24 out/Debug/browser_tests'
-alias rcr=out/Debug/chrome
-alias rct=out/Debug/browser_tests
+gnwd() { bash /usr/share/doc/git/contrib/workdir/git-new-workdir "$@"; }

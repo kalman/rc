@@ -1,0 +1,46 @@
+#!/bin/bash
+
+. $HOME/.profile
+LOGFILE="/tmp/crup.$$.log"
+
+next_stage() {
+  echo $@
+  echo $@ >> $LOGFILE
+}
+
+run() {
+  $@ &>> $LOGFILE
+  echo >> $LOGFILE
+}
+
+echo "Logging to $LOGFILE"
+
+next_stage "Updating Chromium..."
+cdc
+run git svn fetch
+run git pull
+
+VERSION="$1"
+if [ -z "$VERSION" ]; then
+  LKGR=`lkgr 2>/dev/null`
+  VERSION=`git log --grep=src@$LKGR | head -n1 | cut -f2- -d' '`
+fi
+next_stage "Resetting to $VERSION..."
+run git reset --hard "$VERSION"
+
+next_stage "Syncing non-WebKit deps..."
+run gclient sync -fDj 32
+
+cdw
+if [ `gcb` == gclient ]; then
+  next_stage "Syncing WebKit..."
+  run git pull origin master
+  cdc
+  run tools/sync-webkit-git.py
+  cdw
+  run git reset --hard
+else
+  next_stage "Not syncing WebKit, not on gclient..."
+fi
+
+next_stage "Done."

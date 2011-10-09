@@ -10,20 +10,16 @@ export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 # General
 #
 
-alias ls='ls -G'
+l() { ls -G "$@"; }
 
 #
 # Git
 #
 
-alias gnwd='bash /opt/local/share/doc/git-core/contrib/workdir/git-new-workdir'
+gnwd() { bash /opt/local/share/doc/git-core/contrib/workdir/git-new-workdir "$@"; }
 
 #
 # Chromium/WebKit
 #
 
-alias rs=run-safari
-alias bcr='xcodebuild -project chrome/chrome.xcodeproj -configuration Debug -target chrome'
-alias bct='xcodebuild -project chrome/chrome.xcodeproj -configuration Debug -target browser_tests'
-alias rcr=xcodebuild/Debug/Chromium.app/Contents/MacOS/Chromium
-alias rct=xcodebuild/Debug/browser_tests
+rs() { run-safari "$@"; }

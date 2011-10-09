@@ -32,21 +32,16 @@ export PATH="$GOROOT/bin:$PATH"
 # General
 #
 
-alias fn='find . -name'
-alias cd='cd -P'
-alias c=cd
-alias l=ls
-alias ll='ls -l'
-alias la='ls -A'
-alias lla='ls -lA'
-alias v='vim -p'
-alias vp=v
-alias vs='vim -S'
-alias wg='wget --no-check-certificate -O-'
-alias grep='grep --color'
-alias grr="grep -rn --color --exclude='.svn'"
-alias s="screen -DR"
-alias prepend='sed "s|^|$1"'
+fn()      { find . -name "$@"; }
+c()       { cd -P "$@"; }
+ll()      { l -l "$@"; }
+la()      { l -A "$@"; }
+lla()     { l -lA "$@"; }
+v()       { vim -p "$@"; }
+wg()      { wget --no-check-certificate -O- "$@"; }
+grr()     { grep -rn --color --exclude='.svn' "$@"; }
+s()       { screen -DR "$@"; }
+prepend() { sed "s|^|$1" "$@"; }
 
 vl() {
   file=`echo "$1" | cut -d: -f1`
@@ -60,26 +55,26 @@ vl() {
 
 source "$HOME/.rc/git_completion"
 
-alias g="git"
-alias gch="git checkout"
-alias gb="git branch"
-alias gd="git diff"
-alias gs="git status"
-alias gc="git commit"
-alias gst="git status"
-alias gl="git log"
-alias gr="git rebase"
-alias gp="git pull"
-alias gls="git ls-files"
-alias gm="git merge"
-alias ga="git add"
-alias gchm="git checkout master"
-alias gdnm="git diff --numstat master"
-alias gdns="git diff --name-status"
-alias gds="git diff --stat"
-alias glf="git ls-files"
-alias gmb="git merge-base"
-alias gg="git grep"
+g()    { git "$@"; }
+gch()  { git checkout "$@"; }
+gb()   { git branch "$@"; }
+gd()   { git diff "$@"; }
+gs()   { git status "$@"; }
+gc()   { git commit "$@"; }
+gst()  { git status "$@"; }
+gl()   { git log "$@"; }
+gr()   { git rebase "$@"; }
+gp()   { git pull "$@"; }
+gls()  { git ls-files "$@"; }
+gm()   { git merge "$@"; }
+ga()   { git add "$@"; }
+gchm() { git checkout master "$@"; }
+gdnm() { git diff --numstat master "$@"; }
+gdns() { git diff --name-status "$@"; }
+gds()  { git diff --stat "$@"; }
+glf()  { git ls-files "$@"; }
+gmb()  { git merge-base "$@"; }
+gg()   { git grep "$@"; }
 
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_checkout gch
@@ -95,11 +90,11 @@ unmerged() {
 }
 
 gC() {
-  gc -m `gcb` $@
+  gc -m `gcb` "$@"
 }
 
 gcb() {
-  gb | grep '^*' | cut -f2- -d' '
+  git branch | grep '^*' | cut -f2- -d' '
 }
 
 gbase() {
@@ -119,12 +114,15 @@ changed() {
 # Chromium/WebKit
 #
 
-alias bw=build-webkit
-alias rwt=run-webkit-tests
-alias nrwt=new-run-webkit-tests
-alias lkgr='curl http://chromium-status.appspot.com/lkgr'
-alias rl=run-launder
-alias pc='prepare-ChangeLog --merge-base `git merge-base master HEAD`'
+bw()   { build-webkit "$@"; }
+rwt()  { run-webkit-tests "$@"; }
+nrwt() { new-run-webkit-tests "$@"; }
+rl()   { run-launder "$@"; }
+pc()   { prepare-ChangeLog --merge-base `git merge-base master HEAD` "$@"; }
+
+lkgr() {
+  curl http://chromium-status.appspot.com/lkgr
+}
 
 export CRDIR="$HOME/chromium"
 cdc() {
@@ -138,45 +136,6 @@ cdw() {
 wkup() {
   git fetch && git svn rebase
   # && update-webkit --chromium
-}
-
-crup() {
-  old_dir=`pwd`
-
-  cdw
-  if [ `gcb` != gclient ]; then
-    echo 'WARNING: WebKit not on gclient.  It will not be synced.'
-  fi
-
-  cdc
-
-  echo; echo "Updating Chromium..."
-  git pull
-
-  if [ -n "$1" ]; then
-    version="$1"
-  else
-    lkgr=`lkgr 2>/dev/null`
-    version=`gl --grep=src@$lkgr | head -n1 | cut -f2- -d' '`
-  fi
-  echo; echo "Resetting to $version"
-  git reset --hard "$version"
-
-  echo; echo "Syncing non-WebKit deps..."
-  gclient sync -fDj 32
-
-  cdw
-  if [ `gcb` == gclient ]; then
-    echo; echo "Syncing WebKit..."
-    git pull origin master
-    cdc
-    tools/sync-webkit-git.py
-    cdw
-    git reset --hard
-  fi
-
-  echo; echo "Done."
-  cd "$old_dir"
 }
 
 crpatch() {
