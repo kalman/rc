@@ -17,7 +17,7 @@ esac
 __hostname() {
   hostname -s | sed -E 's/dhcp-(.*)$/mac/'
 }
-export PS1='\[\033[01;32m\]$(__hostname)\[\033[01;34m\] \w\[\033[31m\]$(__git_ps1 "(%s)") \[\033[00m\]'
+export PS1='\[\033[01;32m\]# $(__hostname)\[\033[01;34m\] \w \[\033[31m\]$(__git_ps1 "(%s)")\n\[\033[01;32m\]> \[\033[00m\]'
 
 export GOROOT="$HOME/local/go"
 export EDITOR="vim"
@@ -38,6 +38,7 @@ ll()      { l -l "$@"; }
 la()      { l -A "$@"; }
 lla()     { l -lA "$@"; }
 v()       { vim -p "$@"; }
+e()       { vim -p "$@"; }
 wg()      { wget --no-check-certificate -O- "$@"; }
 grr()     { grep -rn --color --exclude='.svn' "$@"; }
 s()       { screen -DR "$@"; }
@@ -57,7 +58,7 @@ source "$HOME/.rc/git_completion"
 
 g()    { git "$@"; }
 gch()  { git checkout "$@"; }
-gb()   { git branch "$@"; }
+gb()   { git branch "$@" | grep -v '^  __' | grep -v ' master$'; }
 gd()   { git diff "$@"; }
 gs()   { git status "$@"; }
 gc()   { git commit "$@"; }
@@ -77,7 +78,9 @@ gmb()  { git merge-base "$@"; }
 gg()   { git grep "$@"; }
 
 complete -o default -o nospace -F _git_branch gb
+complete -o default -o nospace -F _git_branch ghide
 complete -o default -o nospace -F _git_checkout gch
+complete -o default -o nospace -F _git_checkout gchr
 complete -o default -o nospace -F _git_diff gd
 complete -o default -o nospace -F _git_diff gdns
 complete -o default -o nospace -F _git_diff gds
@@ -102,12 +105,47 @@ gbase() {
   gmb $branch origin/trunk
 }
 
+gtry() {
+  tag="$1"
+  if [ -n "$tag" ]; then
+    tag="-$tag"
+  fi
+  g try "`gcb`-$tag"
+}
+
+ghide() {
+  branch="$1"
+  if [ -z "$branch" ]; then
+    echo "ERROR: no branch supplied"
+    return
+  fi
+  gb "$branch" -m "__`date +%F`__$branch"
+}
+
 changed() {
   base="$1"
   if [ -z "$base" ]; then
     base=`gbase`
   fi
   gdns "$base" | cut -f2
+}
+
+gdiff() {
+  base="$1"
+  if [ -z "$base" ]; then
+    base=`gbase`
+  fi
+  gd "$base"
+}
+
+gchr() {
+  branch="$1"
+  if [ -z "$branch" ]; then
+    echo "ERROR: no branch supplied"
+    return
+  fi
+  gch "$branch"
+  gr master
 }
 
 #
@@ -126,12 +164,15 @@ lkgr() {
 
 export CRDIR="$HOME/chromium"
 cdc() {
-  cd "${CRDIR}${1}"
+  c "${CRDIR}${1}"
 }
 export WKDIR="$HOME/chromium/third_party/WebKit"
 cdw() {
-  cd "$WKDIR"
+  c "$WKDIR"
 }
+
+# For while I work on extension settings.
+export s="chrome/browser/extensions"
 
 wkup() {
   git fetch && git svn rebase

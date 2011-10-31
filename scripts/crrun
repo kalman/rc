@@ -15,11 +15,11 @@ port=`echo "$both_ports" | cut -f2 -d,`
 # Shift past the xmpp args
 shift
 
-rcr \
+out/Debug/chrome \
   --enable-sync-extension-settings=true \
   --sync-url=http://127.0.0.1:${port}/chromiumsync \
   --enable-experimental-extension-apis \
   --sync-notification-method=p2p \
   --sync-notification-host=127.0.0.1:${xmpp_port} \
   --sync-allow-insecure-xmpp-connection \
-  $@
+  "$@"

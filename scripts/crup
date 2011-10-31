@@ -13,12 +13,17 @@ run() {
   echo >> $LOGFILE
 }
 
-echo "Logging to $LOGFILE"
-
-next_stage "Updating Chromium..."
 cdc
+if [ `gcb` != master ]; then
+  echo "Not on master branch, quitting."
+  exit 1
+fi
+
+echo "Logging to $LOGFILE"
+next_stage "Updating Chromium..."
+run git fetch
 run git svn fetch
-run git pull
+run git svn rebase -l
 
 VERSION="$1"
 if [ -z "$VERSION" ]; then
@@ -42,5 +47,9 @@ if [ `gcb` == gclient ]; then
 else
   next_stage "Not syncing WebKit, not on gclient..."
 fi
+
+cdc
+next_stage "Updating clang..."
+run tools/clang/scripts/update.sh
 
 next_stage "Done."
