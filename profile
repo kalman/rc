@@ -106,11 +106,9 @@ gbase() {
 }
 
 gtry() {
-  tag="$1"
-  if [ -n "$tag" ]; then
-    tag="-$tag"
-  fi
-  g try "`gcb`-$tag"
+  tag=`date +%H:%M`
+  revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
+  g try -n "`gcb`-$tag" -r "$revision"
 }
 
 ghide() {
@@ -148,6 +146,10 @@ gchr() {
   gr master
 }
 
+gfind() {
+  gls "*/$1"
+}
+
 #
 # Chromium/WebKit
 #
@@ -172,7 +174,7 @@ cdw() {
 }
 
 # For while I work on extension settings.
-export s="chrome/browser/extensions"
+export s="chrome/browser/extensions/settings"
 
 wkup() {
   git fetch && git svn rebase
