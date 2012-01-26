@@ -22,7 +22,7 @@ do_build() {
   fi
 
   if $REBUILD; then
-    build/gyp_chromium -D disable_nacl=1
+    build/gyp_chromium #-D disable_nacl=1
   fi
 
   targets="$@"

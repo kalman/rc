@@ -81,6 +81,7 @@ complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch ghide
 complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_checkout gchr
+complete -o default -o nospace -F _git_diff changed
 complete -o default -o nospace -F _git_diff gd
 complete -o default -o nospace -F _git_diff gdns
 complete -o default -o nospace -F _git_diff gds
@@ -108,16 +109,17 @@ gbase() {
 gtry() {
   tag=`date +%H:%M`
   revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
-  g try -n "`gcb`-$tag" -r "$revision"
+  g try -n "`gcb`-$tag" -r "$revision" "$@"
 }
 
 ghide() {
-  branch="$1"
-  if [ -z "$branch" ]; then
-    echo "ERROR: no branch supplied"
+  if [ -z "$1" ]; then
+    echo "ERROR: no branch(es) supplied"
     return
   fi
-  gb "$branch" -m "__`date +%F`__$branch"
+  for branch in "$@"; do
+    gb "$branch" -m "__`date +%F`__$branch"
+  done
 }
 
 changed() {
@@ -137,17 +139,24 @@ gdiff() {
 }
 
 gchr() {
+  oldBranch=`gcb`
   branch="$1"
   if [ -z "$branch" ]; then
     echo "ERROR: no branch supplied"
     return
   fi
   gch "$branch"
-  gr master
+  gr "$oldBranch"
 }
 
 gfind() {
   gls "*/$1"
+}
+
+gsquash() {
+  g reset `gbase`
+  ga chrome
+  gC
 }
 
 #
@@ -231,6 +240,18 @@ crsync() {
   cd $old_dir
 }
 
+crbr() {
+  if [ -z "$1" ]; then
+    echo "Usage: $0 TESTNAME args..."
+    return 1
+  fi
+
+  local testname="$1"
+  shift
+
+  crclang "$testname" && "b/$testname" "$@"
+}
+
 po() {
   old_dir=`pwd`
   if [ -d "$1" ]; then
@@ -258,4 +279,21 @@ po() {
 
   unset print_owners
   cd "$old_dir"
+}
+
+greplace() {
+  from="$1"
+  to="$2"
+
+  if [ -z "$from" -o -z "$to" ]; then
+    echo "greplace from to <args>"
+    return 1
+  fi
+
+  shift 2
+
+  for f in `gg -l "$@" "$from"`; do
+    echo "Replacing in $f"
+    sed -i "s/$from/$to/g" "$f"
+  done
 }

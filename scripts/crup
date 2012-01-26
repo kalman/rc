@@ -39,7 +39,10 @@ run gclient sync -fDj 32
 cdw
 if [ `gcb` == gclient ]; then
   next_stage "Syncing WebKit..."
-  run git pull origin master
+  run git fetch http://git.chromium.org/external/Webkit.git master
+  run git fetch origin master
+  #run git rebase master gclient
+  run git rebase master
   cdc
   run tools/sync-webkit-git.py
   cdw
