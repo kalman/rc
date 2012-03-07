@@ -76,6 +76,7 @@ gds()  { git diff --stat "$@"; }
 glf()  { git ls-files "$@"; }
 gmb()  { git merge-base "$@"; }
 gg()   { git grep "$@"; }
+gclu() { git cl upload -m .; }
 
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch ghide
@@ -103,13 +104,20 @@ gcb() {
 
 gbase() {
   branch=`gcb`
-  gmb $branch origin/trunk
+  gmb $branch master
 }
 
 gtry() {
   tag=`date +%H:%M`
   revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
-  g try -n "`gcb`-$tag" -r "$revision" "$@"
+
+  bots="$1"
+  if [ -z "$bots" ]; then
+    default_bots=`echo $(g try --print_bots | grep '^  ') | tr ' ' ,`
+    bots="${default_bots},win,mac,linux"
+  fi
+
+  g try -n "`gcb`-$tag" -r "$revision" -b "$bots"
 }
 
 ghide() {
@@ -149,6 +157,24 @@ gchr() {
   gr "$oldBranch"
 }
 
+crb() {
+  crclang "$@"
+}
+
+crt() {
+  target="$1"
+  filter="$2"
+  shift 2
+  if [ -z "$target" ]; then
+    echo "Usage: $0 target [filter]"
+    return
+  fi
+  if [ -n "$filter" ]; then
+    filter="--gtest_filter=$filter"
+  fi
+  "$target" "$filter" "$@"
+}
+
 gfind() {
   gls "*/$1"
 }
@@ -184,61 +210,6 @@ cdw() {
 
 # For while I work on extension settings.
 export s="chrome/browser/extensions/settings"
-
-wkup() {
-  git fetch && git svn rebase
-  # && update-webkit --chromium
-}
-
-crpatch() {
-  # TODO: make sure there are no changes between this branch and origin/trunk
-
-  if [ -z "$1" ]; then
-    echo "Usage: crpatch HOST [BRANCH]"
-    return 1
-  fi
-  host="$1"
-
-  if [ -n "$2" ]; then
-    branch="$2"
-  else
-    branch=`ssh $host "cd chromium; git symbolic-ref HEAD"`
-    branch="${branch##refs/heads/}"
-  fi
-
-  version=`ssh $host "cd chromium; git merge-base $branch origin/trunk"`
-  crup $version
-
-  echo; echo "Patching changes from $branch..."
-  ssh $host "cd chromium; git diff $version" | patch -p1
-  echo; echo "Done."
-}
-
-crsync() {
-  if [ -z "$1" ]; then
-    echo "Usage: crpatch HOST"
-    return 1
-  fi
-  host="$1"
-
-  old_dir=$PWD
-  for dir in chrome net; do
-    cdc
-    cd $dir
-    rsync -avzC \
-      --include '*.cc' \
-      --include '*.cpp' \
-      --include '*.gyp' \
-      --include '*.gypi' \
-      --include '*.h' \
-      --include '*.html' \
-      --include '*.js' \
-      --include '*.proto' \
-      --include '*.py' \
-      $host:chromium/$dir/ .
-  done
-  cd $old_dir
-}
 
 crbr() {
   if [ -z "$1" ]; then
