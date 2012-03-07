@@ -1,5 +1,8 @@
 [user]
 	name = Benjamin Kalman
-	email = btkalman@gmail.com
+	email = kalman@chromium.org
 [color]
 	ui = true
+[core]
+	autocrlf = false
+	filemode = false

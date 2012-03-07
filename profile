@@ -76,11 +76,13 @@ gds()  { git diff --stat "$@"; }
 glf()  { git ls-files "$@"; }
 gmb()  { git merge-base "$@"; }
 gg()   { git grep "$@"; }
+gclu() { git cl upload -m .; }
 
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch ghide
 complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_checkout gchr
+complete -o default -o nospace -F _git_diff changed
 complete -o default -o nospace -F _git_diff gd
 complete -o default -o nospace -F _git_diff gdns
 complete -o default -o nospace -F _git_diff gds
@@ -102,22 +104,30 @@ gcb() {
 
 gbase() {
   branch=`gcb`
-  gmb $branch origin/trunk
+  gmb $branch master
 }
 
 gtry() {
   tag=`date +%H:%M`
   revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
-  g try -n "`gcb`-$tag" -r "$revision"
+
+  bots="$1"
+  if [ -z "$bots" ]; then
+    default_bots=`echo $(g try --print_bots | grep '^  ') | tr ' ' ,`
+    bots="${default_bots},win,mac,linux"
+  fi
+
+  g try -n "`gcb`-$tag" -r "$revision" -b "$bots"
 }
 
 ghide() {
-  branch="$1"
-  if [ -z "$branch" ]; then
-    echo "ERROR: no branch supplied"
+  if [ -z "$1" ]; then
+    echo "ERROR: no branch(es) supplied"
     return
   fi
-  gb "$branch" -m "__`date +%F`__$branch"
+  for branch in "$@"; do
+    gb "$branch" -m "__`date +%F`__$branch"
+  done
 }
 
 changed() {
@@ -137,17 +147,42 @@ gdiff() {
 }
 
 gchr() {
+  oldBranch=`gcb`
   branch="$1"
   if [ -z "$branch" ]; then
     echo "ERROR: no branch supplied"
     return
   fi
   gch "$branch"
-  gr master
+  gr "$oldBranch"
+}
+
+crb() {
+  crclang "$@"
+}
+
+crt() {
+  target="$1"
+  filter="$2"
+  shift 2
+  if [ -z "$target" ]; then
+    echo "Usage: $0 target [filter]"
+    return
+  fi
+  if [ -n "$filter" ]; then
+    filter="--gtest_filter=$filter"
+  fi
+  "$target" "$filter" "$@"
 }
 
 gfind() {
   gls "*/$1"
+}
+
+gsquash() {
+  g reset `gbase`
+  ga chrome
+  gC
 }
 
 #
@@ -176,59 +211,16 @@ cdw() {
 # For while I work on extension settings.
 export s="chrome/browser/extensions/settings"
 
-wkup() {
-  git fetch && git svn rebase
-  # && update-webkit --chromium
-}
-
-crpatch() {
-  # TODO: make sure there are no changes between this branch and origin/trunk
-
+crbr() {
   if [ -z "$1" ]; then
-    echo "Usage: crpatch HOST [BRANCH]"
+    echo "Usage: $0 TESTNAME args..."
     return 1
   fi
-  host="$1"
 
-  if [ -n "$2" ]; then
-    branch="$2"
-  else
-    branch=`ssh $host "cd chromium; git symbolic-ref HEAD"`
-    branch="${branch##refs/heads/}"
-  fi
+  local testname="$1"
+  shift
 
-  version=`ssh $host "cd chromium; git merge-base $branch origin/trunk"`
-  crup $version
-
-  echo; echo "Patching changes from $branch..."
-  ssh $host "cd chromium; git diff $version" | patch -p1
-  echo; echo "Done."
-}
-
-crsync() {
-  if [ -z "$1" ]; then
-    echo "Usage: crpatch HOST"
-    return 1
-  fi
-  host="$1"
-
-  old_dir=$PWD
-  for dir in chrome net; do
-    cdc
-    cd $dir
-    rsync -avzC \
-      --include '*.cc' \
-      --include '*.cpp' \
-      --include '*.gyp' \
-      --include '*.gypi' \
-      --include '*.h' \
-      --include '*.html' \
-      --include '*.js' \
-      --include '*.proto' \
-      --include '*.py' \
-      $host:chromium/$dir/ .
-  done
-  cd $old_dir
+  crclang "$testname" && "b/$testname" "$@"
 }
 
 po() {
@@ -258,4 +250,21 @@ po() {
 
   unset print_owners
   cd "$old_dir"
+}
+
+greplace() {
+  from="$1"
+  to="$2"
+
+  if [ -z "$from" -o -z "$to" ]; then
+    echo "greplace from to <args>"
+    return 1
+  fi
+
+  shift 2
+
+  for f in `gg -l "$@" "$from"`; do
+    echo "Replacing in $f"
+    sed -i "s/$from/$to/g" "$f"
+  done
 }

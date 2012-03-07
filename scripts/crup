@@ -13,7 +13,6 @@ run() {
   echo >> $LOGFILE
 }
 
-cdc
 if [ `gcb` != master ]; then
   echo "Not on master branch, quitting."
   exit 1
@@ -23,7 +22,10 @@ echo "Logging to $LOGFILE"
 next_stage "Updating Chromium..."
 run git fetch
 run git svn fetch
-run git svn rebase -l
+run git svn rebase
+
+next_stage "Syncing deps..."
+run gclient sync -fDj 32
 
 VERSION="$1"
 if [ -z "$VERSION" ]; then
@@ -32,24 +34,5 @@ if [ -z "$VERSION" ]; then
 fi
 next_stage "Resetting to $VERSION..."
 run git reset --hard "$VERSION"
-
-next_stage "Syncing non-WebKit deps..."
-run gclient sync -fDj 32
-
-cdw
-if [ `gcb` == gclient ]; then
-  next_stage "Syncing WebKit..."
-  run git pull origin master
-  cdc
-  run tools/sync-webkit-git.py
-  cdw
-  run git reset --hard
-else
-  next_stage "Not syncing WebKit, not on gclient..."
-fi
-
-cdc
-next_stage "Updating clang..."
-run tools/clang/scripts/update.sh
 
 next_stage "Done."
