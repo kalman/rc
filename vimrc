@@ -29,6 +29,7 @@ map gF :tabe <cfile><CR>
 map q Gyy<c-o>p
 map Q Gyy<c-o>P
 map & *<c-o>
+map Xw :wa<cr>
 map XX :qa<cr>
 map XQ :qa!<cr>
 map <c-j> <c-e>
