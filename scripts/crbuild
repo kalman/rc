@@ -25,7 +25,7 @@ do_build() {
   export GYP_GENERATORS="ninja"
 
   if $REBUILD; then
-    build/gyp_chromium -D disable_nacl=1
+    build/gyp_chromium
   fi
 
   targets="$@"

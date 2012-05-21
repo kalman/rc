@@ -20,12 +20,12 @@ fi
 
 echo "Logging to $LOGFILE"
 next_stage "Updating Chromium..."
-run git fetch
-run git svn fetch
-run git svn rebase
+run git pull # fetch
+# run git svn fetch
+# run git svn rebase
 
 next_stage "Syncing deps..."
-run gclient sync -fDj 32
+run crsync
 
 VERSION="$1"
 if [ -z "$VERSION" ]; then

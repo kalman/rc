@@ -76,7 +76,6 @@ gds()  { git diff --stat "$@"; }
 glf()  { git ls-files "$@"; }
 gmb()  { git merge-base "$@"; }
 gg()   { git grep "$@"; }
-gclu() { git cl upload -m .; }
 
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch ghide
@@ -109,7 +108,7 @@ gbase() {
 
 gtry() {
   tag=`date +%H:%M`
-  revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
+  revision=`gl | grep src@ | head -n1 | sed -E 's/.*(src@[0-9]+).*/\1/g'`
 
   bots="$1"
   if [ -z "$bots" ]; then
@@ -117,7 +116,12 @@ gtry() {
     bots="${default_bots},win,mac,linux"
   fi
 
-  g try -n "`gcb`-$tag" -r "$revision" -b "$bots"
+  tests="$2"
+  if [ -n "$tests" ]; then
+    tests="-t $tests"
+  fi
+
+  g try -n "`gcb`-$tag" -r "$revision" -b "$bots" $tests
 }
 
 ghide() {
@@ -128,6 +132,27 @@ ghide() {
   for branch in "$@"; do
     gb "$branch" -m "__`date +%F`__$branch"
   done
+}
+
+gclean() {
+  current_date=`date +%F | tr -d -`
+  for branch in `git branch | grep -E '__[0-9-]+__'`; do
+    branch_date=`echo "$branch" | grep -Eo '__[0-9-]+__' | tr -d _-`
+    if [ $branch_date -lt $(( $current_date - 100 )) ]; then
+      read -N 1 -p "Delete $branch [N/y] "
+      echo
+      if [ "$REPLY" = y ]; then
+        git branch -D "$branch"
+        echo
+      fi
+    fi
+  done
+
+  read -N 1 -p "Run \"git gc\" [N/y] "
+  echo
+  if [ "$REPLY" = y ]; then
+    git gc
+  fi
 }
 
 changed() {
@@ -267,4 +292,12 @@ greplace() {
     echo "Replacing in $f"
     sed -i "s/$from/$to/g" "$f"
   done
+}
+
+crsync() {
+  gclient sync -fDj32 -r src@HEAD
+}
+
+gclu() {
+  g cl upload `gbase` "$@" --cc benwells@chromium.org,koz@chromium.org
 }
