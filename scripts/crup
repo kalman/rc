@@ -9,7 +9,8 @@ next_stage() {
 }
 
 run() {
-  $@ &>> $LOGFILE
+  #$@ &>> $LOGFILE
+  $@ >> $LOGFILE
   echo >> $LOGFILE
 }
 

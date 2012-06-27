@@ -290,7 +290,7 @@ greplace() {
 
   for f in `gg -l "$@" "$from"`; do
     echo "Replacing in $f"
-    sed -i "s/$from/$to/g" "$f"
+    sed -i '' "s/$from/$to/g" "$f"
   done
 }
 
