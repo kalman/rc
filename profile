@@ -34,7 +34,9 @@ export PATH="$GOROOT/bin:$PATH"
 
 fn()      { find . -name "$@"; }
 c()       { cd -P "$@"; }
+unalias ll
 ll()      { l -l "$@"; }
+unalias la
 la()      { l -A "$@"; }
 lla()     { l -lA "$@"; }
 v()       { vim -p "$@"; }

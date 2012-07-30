@@ -4,6 +4,7 @@
 # General
 #
 
+unalias l
 l() { ls --color "$@"; }
 
 #

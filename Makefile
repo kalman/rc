@@ -23,5 +23,6 @@ gitconfig:
 	ln -s $(RC)/gitconfig $(HOME)/.gitconfig
 
 rc_scripts:
+	mkdir -p $(HOME)/local
 	rm -f $(HOME)/local/rc_scripts
 	ln -s $(RC)/scripts $(HOME)/local/rc_scripts
