@@ -33,5 +33,10 @@ do_build() {
     targets="chrome browser_tests unit_tests"
   fi
 
-  exec ninja -C out/Debug -j32 $targets
+  base=out/Debug
+  if [ -n "$RELEASE" ]; then
+    base=out/Release
+  fi
+
+  exec ninja -C $base -j32 $targets
 }

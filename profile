@@ -78,6 +78,7 @@ gds()  { git diff --stat "$@"; }
 glf()  { git ls-files "$@"; }
 gmb()  { git merge-base "$@"; }
 gg()   { git grep "$@"; }
+gcp()  { git cherry-pick "$@"; }
 
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch ghide
@@ -301,5 +302,5 @@ crsync() {
 }
 
 gclu() {
-  g cl upload `gbase` "$@" --cc benwells@chromium.org,koz@chromium.org
+  g cl upload `gbase` "$@" --cc benwells@chromium.org
 }
