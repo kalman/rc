@@ -32,11 +32,15 @@ export PATH="$GOROOT/bin:$PATH"
 # General
 #
 
+for a in l ll la; do
+  if alias -p | grep $a; then
+    unalias $a
+  fi
+done
+
 fn()      { find . -name "$@"; }
 c()       { cd -P "$@"; }
-unalias ll
 ll()      { l -l "$@"; }
-unalias la
 la()      { l -A "$@"; }
 lla()     { l -lA "$@"; }
 v()       { vim -p "$@"; }

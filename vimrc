@@ -1,7 +1,7 @@
 syntax on
 filetype indent on
 filetype plugin on
-colorscheme koehler
+colorscheme ben
 
 set autoindent
 set cursorline
@@ -54,9 +54,14 @@ fu! GetOther(fn)
         if filereadable(s:cpp)
             return s:cpp
         endif
+        " Attempt to open an ObjC file.
+        let s:mm = SetSuffix(a:fn, "mm")
+        if filereadable(s:mm)
+            return s:mm
+        endif
         " Default to opening a (possibly new) .cc file.
         return SetSuffix(a:fn, "cc")
-    elseif a:fn =~ "\\.cc$" || a:fn =~ "\\.cpp"
+    elseif a:fn =~ "\\.cc$" || a:fn =~ "\\.cpp" || a:fn =~ "\\.mm"
         return SetSuffix(a:fn, "h")
     endif
     return 1
