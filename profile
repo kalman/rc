@@ -1,6 +1,16 @@
 #!/bin/bash
 
 #
+# Undo stuff before sourcing anything
+#
+
+for a in l ll la; do
+  if alias -p | grep $a &>/dev/null; then
+    unalias $a
+  fi
+done
+
+#
 # Platform specific (first because some stuff in here relies on it)
 #
 
@@ -31,12 +41,6 @@ export PATH="$GOROOT/bin:$PATH"
 #
 # General
 #
-
-for a in l ll la; do
-  if alias -p | grep $a; then
-    unalias $a
-  fi
-done
 
 fn()      { find . -name "$@"; }
 c()       { cd -P "$@"; }
