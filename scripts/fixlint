@@ -35,6 +35,28 @@ def FixHeaderIfdefs(files):
       elif line.startswith('#endif  // CHROME'):
         contents[i] = '#endif  // %s' % token
 
+def FixLongLines(files):
+  for name, contents in files.items():
+    new_contents = []
+    for line in contents:
+      if len(line) <= 80:
+        new_contents.append(line)
+        continue
+      public_index = line.find(': public')
+      if public_index > 0:
+        new_contents.append(line[:public_index].rstrip())
+        new_contents.append('    %s' % line[public_index:])
+        continue
+      paren_index = line.find('(')
+      if paren_index > 20:
+        new_contents.append(line[:paren_index + 1])
+        current_indent = line[:(len(line)-len(line.lstrip()))]
+        new_contents.append(
+            '%s    %s' % (current_indent, line[paren_index + 1:]))
+        continue
+      new_contents.append(line)
+    files[name] = new_contents
+
 if __name__ == '__main__':
   git_diff = subprocess.Popen(['git', 'diff', '--name-status', 'master'],
                               stdout=subprocess.PIPE)
@@ -55,6 +77,7 @@ if __name__ == '__main__':
 
   FixIncludeOrder(changed_files)
   FixHeaderIfdefs(changed_files)
+  FixLongLines(changed_files)
 
   for name, contents in changed_files.items():
     changed_file = open(name, 'w')
