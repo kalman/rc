@@ -1,0 +1,42 @@
+#!/usr/bin/python
+
+import subprocess
+import sys
+
+if __name__ == '__main__':
+  git_diff = subprocess.Popen(['git', 'diff', '--name-status', 'master'],
+                              stdout=subprocess.PIPE)
+  status_code = git_diff.wait()
+  if status_code != 0:
+    sys.exit(status_code)
+  git_diff_output = git_diff.communicate()[0]
+
+  changed_files = {}
+  for line in git_diff_output.split('\n'):
+    if line.startswith('D'):
+      continue
+    line = line[len('M\t'):]  # A or M
+    if line.endswith('.cc') or line.endswith('.h'):
+      changed_file = open(line, 'r')
+      changed_files[line] = changed_file.read().split('\n')
+      changed_file.close()
+
+  for name, contents in changed_files.items():
+    sorted_contents = []
+    while len(contents):
+      line = contents.pop(0)
+      if line.startswith('#include'):
+        includes = []
+        while line.startswith('#include'):
+          includes.append(line)
+          if len(contents) == 0:
+            break
+          line = contents.pop(0)
+        sorted_contents += list(sorted(includes))
+        if not line.startswith('#include'):
+          sorted_contents.append(line)
+      else:
+        sorted_contents.append(line)
+    changed_file = open(name, 'w')
+    changed_file.write('\n'.join(sorted_contents))
+    changed_file.close()

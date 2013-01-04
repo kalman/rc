@@ -21,8 +21,9 @@ do_build() {
     exit 0
   fi
 
-  export BUILDTYPE="Debug"
-  export GYP_GENERATORS="ninja"
+  export BUILDTYPE=Debug
+  export GYP_GENERATORS=ninja
+  export GYP_PARALLEL=1
 
   if $REBUILD; then
     build/gyp_chromium

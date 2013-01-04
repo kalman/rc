@@ -12,6 +12,8 @@ export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
 l() { ls -G "$@"; }
 
+export SED_I_SUFFIX=' '
+
 #
 # Git
 #

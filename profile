@@ -6,7 +6,7 @@
 
 for a in l ll la; do
   if alias -p | grep $a &>/dev/null; then
-    unalias $a
+    unalias $a &>/dev/null
   fi
 done
 
@@ -301,7 +301,7 @@ greplace() {
 
   for f in `gg -l "$@" "$from"`; do
     echo "Replacing in $f"
-    sed -i '' "s/$from/$to/g" "$f"
+    sed -i $SED_I_SUFFIX "s:$from:$to:g" "$f"
   done
 }
 
@@ -310,5 +310,5 @@ crsync() {
 }
 
 gclu() {
-  g cl upload `gbase` "$@" --cc benwells@chromium.org
+  g cl upload `gbase` "$@"
 }
