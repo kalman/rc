@@ -18,6 +18,8 @@ set expandtab
 set backspace=indent,eol,start
 set nocindent
 set autoindent
+set wildmode=longest,list,full
+set wildmenu
 
 "map j gj
 "map k gk

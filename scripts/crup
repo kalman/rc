@@ -22,8 +22,8 @@ fi
 echo "Logging to $LOGFILE"
 next_stage "Updating Chromium..."
 run git pull # fetch
-# run git svn fetch
-# run git svn rebase
+run git svn fetch
+run git svn rebase
 
 next_stage "Syncing deps..."
 run crsync

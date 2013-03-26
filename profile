@@ -53,6 +53,7 @@ wg()      { wget --no-check-certificate -O- "$@"; }
 grr()     { grep -rn --color --exclude='.svn' "$@"; }
 s()       { screen -DR "$@"; }
 prepend() { sed "s|^|$1" "$@"; }
+sx()      { ssh -Y "$@"; }
 
 vl() {
   file=`echo "$1" | cut -d: -f1`
@@ -221,31 +222,10 @@ gsquash() {
   gC
 }
 
-#
-# Chromium/WebKit
-#
-
-bw()   { build-webkit "$@"; }
-rwt()  { run-webkit-tests "$@"; }
-nrwt() { new-run-webkit-tests "$@"; }
-rl()   { run-launder "$@"; }
-pc()   { prepare-ChangeLog --merge-base `git merge-base master HEAD` "$@"; }
-
-lkgr() {
-  curl http://chromium-status.appspot.com/lkgr
-}
-
 export CRDIR="$HOME/chromium"
 cdc() {
   c "${CRDIR}${1}"
 }
-export WKDIR="$HOME/chromium/third_party/WebKit"
-cdw() {
-  c "$WKDIR"
-}
-
-# For while I work on extension settings.
-export s="chrome/browser/extensions/settings"
 
 crbr() {
   if [ -z "$1" ]; then
@@ -301,7 +281,7 @@ greplace() {
 
   for f in `gg -l "$@" "$from"`; do
     echo "Replacing in $f"
-    sed -i $SED_I_SUFFIX "s:$from:$to:g" "$f"
+    sedi "s:$from:$to:g" "$f"
   done
 }
 

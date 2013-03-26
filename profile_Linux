@@ -1,13 +1,4 @@
 #!/bin/bash
 
-#
-# General
-#
-
 l() { ls --color "$@"; }
-
-#
-# Git
-#
-
-gnwd() { bash /usr/share/doc/git/contrib/workdir/git-new-workdir "$@"; }
+sedi() { sed -i "$@"; }

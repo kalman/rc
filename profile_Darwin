@@ -1,27 +1,6 @@
 #!/bin/bash
 
-#
-# Paths etc
-#
-
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
-#
-# General
-#
-
 l() { ls -G "$@"; }
-
-export SED_I_SUFFIX=' '
-
-#
-# Git
-#
-
-gnwd() { bash /opt/local/share/doc/git-core/contrib/workdir/git-new-workdir "$@"; }
-
-#
-# Chromium/WebKit
-#
-
-rs() { run-safari "$@"; }
+sedi() { sed -i' ' "$@"; }
