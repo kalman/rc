@@ -3,4 +3,4 @@
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
 l() { ls -G "$@"; }
-sedi() { sed -i' ' "$@"; }
+sedi() { sed -i '' "$@"; }
