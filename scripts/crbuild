@@ -39,5 +39,5 @@ do_build() {
     base=out/Release
   fi
 
-  exec ninja -C $base -j32 $targets
+  exec ninja -C $base -j64 $targets
 }

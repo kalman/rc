@@ -37,6 +37,8 @@ export PATH="$HOME/local/bin:$PATH"
 export PATH="$HOME/local/rc_scripts:$PATH"
 export PATH="$HOME/local/depot_tools:$PATH"
 export PATH="$GOROOT/bin:$PATH"
+export PATH="$HOME/goma:$PATH"
+export PATH="/usr/bin:$PATH"
 
 #
 # General
@@ -48,7 +50,7 @@ ll()      { l -l "$@"; }
 la()      { l -A "$@"; }
 lla()     { l -lA "$@"; }
 v()       { vim -p "$@"; }
-e()       { vim -p "$@"; }
+e()       { vim -p $(echo $@ | sed 's/:/ +/'); }
 wg()      { wget --no-check-certificate -O- "$@"; }
 grr()     { grep -rn --color --exclude='.svn' "$@"; }
 s()       { screen -DR "$@"; }
@@ -68,33 +70,41 @@ vl() {
 source "$HOME/.rc/git_completion"
 
 g()    { git "$@"; }
-gch()  { git checkout "$@"; }
-gb()   { git branch "$@" | grep -v '^  __' | grep -v ' master$'; }
-gd()   { git diff "$@"; }
-gs()   { git status "$@"; }
-gc()   { git commit "$@"; }
-gst()  { git status "$@"; }
-gl()   { git log "$@"; }
-gr()   { git rebase "$@"; }
-gp()   { git pull "$@"; }
-gls()  { git ls-files "$@"; }
-gm()   { git merge "$@"; }
 ga()   { git add "$@"; }
+gb()   { git branch "$@" | grep -v '^  __' | grep -v ' master$'; }
+gc()   { git commit "$@"; }
+gcaa() { gc -a --amend; }
+gch()  { git checkout "$@"; }
 gchm() { git checkout master "$@"; }
+gcp()  { git cherry-pick "$@"; }
+gd()   { git diff "$@"; }
 gdnm() { git diff --numstat master "$@"; }
 gdns() { git diff --name-status "$@"; }
 gds()  { git diff --stat "$@"; }
-glf()  { git ls-files "$@"; }
-gmb()  { git merge-base "$@"; }
+gdt()  { git difftool "$@"; }
 gg()   { git grep "$@"; }
-gcp()  { git cherry-pick "$@"; }
+gl()   { git log "$@"; }
+glf()  { git ls-files "$@"; }
+gls()  { git ls-files "$@"; }
+gm()   { git merge "$@"; }
+gmb()  { git merge-base "$@"; }
+gp()   { git pull "$@"; }
+gr()   { git rebase "$@"; }
+gs()   { git status "$@"; }
+gst()  { git status "$@"; }
 
+complete -o default -o nospace -F _git_branch changed
+complete -o default -o nospace -F _git_branch changes
+complete -o default -o nospace -F _git_branch cherry-pick
 complete -o default -o nospace -F _git_branch gb
+complete -o default -o nospace -F _git_branch gcb
 complete -o default -o nospace -F _git_branch ghide
 complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_checkout gchr
 complete -o default -o nospace -F _git_diff changed
+complete -o default -o nospace -F _git_diff changes
 complete -o default -o nospace -F _git_diff gd
+complete -o default -o nospace -F _git_diff gdt
 complete -o default -o nospace -F _git_diff gdns
 complete -o default -o nospace -F _git_diff gds
 complete -o default -o nospace -F _git_merge_base gmb
@@ -119,6 +129,11 @@ gbase() {
 }
 
 gtry() {
+  revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
+  g cl try -r "$revision"
+}
+
+gtrytry() {
   tag=`date +%H:%M`
   revision=`gl | grep src@ | head -n1 | sed -E 's/.*(src@[0-9]+).*/\1/g'`
 
@@ -133,7 +148,7 @@ gtry() {
     tests="-t $tests"
   fi
 
-  g try -n "`gcb`-$tag" -r "$revision" -b "$bots" $tests
+  echo g try -n "`gcb`-$tag" -r "$revision" -b "$bots" $tests
 }
 
 ghide() {
@@ -173,6 +188,14 @@ changed() {
     base=`gbase`
   fi
   gdns "$base" | cut -f2
+}
+
+changes() {
+  base="$1"
+  if [ -z "$base" ]; then
+    base=`gbase`
+  fi
+  gd "$base"
 }
 
 gdiff() {
@@ -281,14 +304,28 @@ greplace() {
 
   for f in `gg -l "$@" "$from"`; do
     echo "Replacing in $f"
-    sedi "s:$from:$to:g" "$f"
+    sedi $SED_I_SUFFIX "s%$from%$to%g" "$f"
   done
-}
-
-crsync() {
-  gclient sync -fDj32 -r src@HEAD
 }
 
 gclu() {
   g cl upload `gbase` "$@"
+}
+
+crup() {
+  git pull
+  gclient sync -f
+}
+
+gb() {
+  back="`pwd`"
+  while [ ! -f .git/config ]; do
+    if [ `pwd` == / ]; then
+      echo 'No .git found'
+      return 0
+    fi
+    cd ..
+  done
+  grep '\[branch "' .git/config | sed 's/^.*"\(.*\)".*$/\1/' | grep -v '^__' | grep -v master
+  cd "$back"
 }

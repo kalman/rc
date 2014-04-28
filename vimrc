@@ -20,6 +20,7 @@ set nocindent
 set autoindent
 set wildmode=longest,list,full
 set wildmenu
+set indentexpr=
 
 "map j gj
 "map k gk
@@ -28,6 +29,7 @@ set wildmenu
 map gr gT
 map m :cnext<CR>
 map e :e 
+map K k 
 map t :tabe 
 map gF :tabe <cfile><CR>
 map q Gyy<c-o>p
