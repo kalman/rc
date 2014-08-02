@@ -31,7 +31,7 @@ do_build() {
 
   targets="$@"
   if [ -z "$targets" ]; then
-    targets="chrome browser_tests unit_tests"
+    targets="chrome browser_tests unit_tests extensions_unittests"
   fi
 
   base=out/Debug
