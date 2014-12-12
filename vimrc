@@ -4,7 +4,6 @@ filetype plugin on
 colorscheme ben
 
 set autoindent
-set cursorline
 set hlsearch
 set modeline
 set number

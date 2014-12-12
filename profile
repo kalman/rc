@@ -69,40 +69,13 @@ vl() {
 
 source "$HOME/.rc/git_completion"
 
-g()    { git "$@"; }
-ga()   { git add "$@"; }
-gb()   { git branch "$@" | grep -v '^  __' | grep -v ' master$'; }
-gc()   { git commit "$@"; }
-gcaa() { gc -a --amend; }
-gch()  { git checkout "$@"; }
-gchm() { git checkout master "$@"; }
-gcp()  { git cherry-pick "$@"; }
-gd()   { git diff "$@"; }
-gdnm() { git diff --numstat master "$@"; }
-gdns() { git diff --name-status "$@"; }
-gds()  { git diff --stat "$@"; }
-gdt()  { git difftool "$@"; }
-gg()   { git grep "$@"; }
-gl()   { git log "$@"; }
-glf()  { git ls-files "$@"; }
-gls()  { git ls-files "$@"; }
-gm()   { git merge "$@"; }
-gmb()  { git merge-base "$@"; }
-gp()   { git pull "$@"; }
-gr()   { git rebase "$@"; }
-gs()   { git status "$@"; }
-gst()  { git status "$@"; }
-
 complete -o default -o nospace -F _git_branch changed
-complete -o default -o nospace -F _git_branch changes
 complete -o default -o nospace -F _git_branch cherry-pick
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch gcb
 complete -o default -o nospace -F _git_branch ghide
 complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_checkout gchr
-complete -o default -o nospace -F _git_diff changed
-complete -o default -o nospace -F _git_diff changes
 complete -o default -o nospace -F _git_diff gd
 complete -o default -o nospace -F _git_diff gdt
 complete -o default -o nospace -F _git_diff gdns
@@ -110,6 +83,30 @@ complete -o default -o nospace -F _git_diff gds
 complete -o default -o nospace -F _git_merge_base gmb
 complete -o default -o nospace -F _git_log gl
 complete -o default -o nospace -F _git_rebase gr
+
+g()    { git "$@"; }
+ga()   { git add "$@"; }
+gb()   { git branch "$@" | grep -v '^  __' | grep -v ' master$'; }
+gbD()  {
+  read -p 'Are you sure? [y/N] ' -n1 READ;
+  if [ "$READ" == 'y' ]; then git branch -D "$@"; fi
+}
+gc()   { git commit "$@"; }
+gcaa() { gc -a --amend; }
+gch()  { git checkout "$@"; }
+gcp()  { git cherry-pick "$@"; }
+gd()   { git diff "$@"; }
+gdns() { git diff --name-status "$@"; }
+gds()  { git diff --stat "$@"; }
+gdt()  { git difftool "$@"; }
+gg()   { git grep "$@"; }
+gl()   { git log "$@"; }
+gls()  { git ls-files "$@"; }
+gm()   { git merge "$@"; }
+gmb()  { git merge-base "$@"; }
+gp()   { git pull "$@"; }
+gr()   { git rebase "$@"; }
+gs()   { git status "$@"; }
 
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
@@ -124,31 +121,15 @@ gcb() {
 }
 
 gbase() {
-  branch=`gcb`
-  gmb $branch master
+  gmb `gcb` origin/master
+}
+
+grev() {
+  gl | grep Cr-Commit-Position | head -n1 | sed -E 's/.*\{#(.*+)\}.*/\1/g'
 }
 
 gtry() {
-  revision=`gl | grep src@ | head -n1 | sed -E 's/.*src@([0-9]+).*/\1/g'`
-  g cl try -r "$revision"
-}
-
-gtrytry() {
-  tag=`date +%H:%M`
-  revision=`gl | grep src@ | head -n1 | sed -E 's/.*(src@[0-9]+).*/\1/g'`
-
-  bots="$1"
-  if [ -z "$bots" ]; then
-    default_bots=`echo $(g try --print_bots | grep '^  ') | tr ' ' ,`
-    bots="${default_bots},win,mac,linux"
-  fi
-
-  tests="$2"
-  if [ -n "$tests" ]; then
-    tests="-t $tests"
-  fi
-
-  echo g try -n "`gcb`-$tag" -r "$revision" -b "$bots" $tests
+  g cl try -r `grev`
 }
 
 ghide() {
@@ -190,22 +171,6 @@ changed() {
   gdns "$base" | cut -f2
 }
 
-changes() {
-  base="$1"
-  if [ -z "$base" ]; then
-    base=`gbase`
-  fi
-  gd "$base"
-}
-
-gdiff() {
-  base="$1"
-  if [ -z "$base" ]; then
-    base=`gbase`
-  fi
-  gd "$base"
-}
-
 gchr() {
   oldBranch=`gcb`
   branch="$1"
@@ -219,6 +184,10 @@ gchr() {
 
 crb() {
   crclang "$@"
+}
+
+crbf() {
+  crb -f "$@"
 }
 
 crt() {
@@ -235,7 +204,7 @@ crt() {
   "$target" "$filter" "$@"
 }
 
-gfind() {
+gf() {
   gls "*/$1"
 }
 
@@ -295,11 +264,6 @@ greplace() {
   from="$1"
   to="$2"
 
-  if [ -z "$from" -o -z "$to" ]; then
-    echo "greplace from to <args>"
-    return 1
-  fi
-
   shift 2
 
   for f in `gg -l "$@" "$from"`; do
@@ -312,20 +276,35 @@ gclu() {
   g cl upload `gbase` "$@"
 }
 
-crup() {
-  git pull
-  gclient sync -f
+gfindconfigpath() {
+  startdir="`pwd`"
+  path='.git/config'
+  while [ ! -f "${startdir}/${path}" ]; do
+    path="../${path}"
+    cd ..
+    if [ "`pwd`" == "/" ]; then
+      echo .
+      return 1
+    fi
+  done
+  echo "$path"
+  cd "$startdir"
 }
 
-gb() {
-  back="`pwd`"
-  while [ ! -f .git/config ]; do
-    if [ `pwd` == / ]; then
-      echo 'No .git found'
-      return 0
-    fi
-    cd ..
-  done
-  grep '\[branch "' .git/config | sed 's/^.*"\(.*\)".*$/\1/' | grep -v '^__' | grep -v master
-  cd "$back"
+gh() {
+  grep '\[branch "' "`gfindconfigpath`" \
+    | sed 's/^.*"\(.*\)".*$/\1/' \
+    | grep -v '^__'
+}
+
+gfc() {
+  issue="$1"
+  if [ -z "$issue" ]; then
+    echo "Usage: gfc <issue>"
+    return 1
+  fi
+  grep "rietveldissue = $issue" "`gfindconfigpath`" -B10 \
+    | grep '^\[branch ' \
+    | tail -n1 \
+    | sed -E 's/\[branch "(.*)"\].*/\1/'
 }
