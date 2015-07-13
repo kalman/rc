@@ -31,20 +31,16 @@ do_build() {
 
   targets="$@"
   if [ -z "$targets" ]; then
-    targets="\
-      app_shell \
-      app_shell_browsertests \
-      app_shell_unittests \
-      browser_tests \
-      chrome \
-      extensions_unittests \
-      unit_tests \
-    "
+    targets="all"
   fi
 
-  base=out/Debug
+  #base=out/Debug
+  base=out/Release
+
   if [ -n "$RELEASE" ]; then
     base=out/Release
+  elif [ -n "$DEBUG" ]; then
+    base=out/Debug
   fi
 
   exec ninja -C $base -j512 $targets

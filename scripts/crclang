@@ -16,15 +16,11 @@ source "$HOME/.rc/scripts/crbuild"
 #                    disable_pie=1                                  "
 
 export GYP_DEFINES="\
-  clang=1                                                                      \
-  use_goma=1
-  component=shared_library                                                     \
+  use_goma=1 \
+  clang=1 \
+  component=shared_library \
+  remove_webcore_debug_symbols=1 \
+  dcheck_always_on=1 \
   "
-
-# export GYP_DEFINES="\
-#   clang=1                                                                      \
-#   release_extra_cflags=\"-fno-omit-frame-pointer -g -O1 -fno-inline\"          \
-#   component=shared_library                                                     \
-# "
 
 do_build "$@"

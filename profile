@@ -32,6 +32,7 @@ export PS1='\[\033[01;32m\]# $(__hostname)\[\033[01;34m\] \w \[\033[31m\]$(__git
 export GOROOT="$HOME/local/go"
 export EDITOR="vim"
 export SVN_LOG_EDITOR="$EDITOR"
+export CHROME_DEVEL_SANDBOX="/usr/local/sbin/chrome-devel-sandbox"
 
 export PATH="$HOME/local/bin:$PATH"
 export PATH="$HOME/local/rc_scripts:$PATH"
@@ -104,6 +105,7 @@ gl()   { git log "$@"; }
 gls()  { git ls-files "$@"; }
 gm()   { git merge "$@"; }
 gmb()  { git merge-base "$@"; }
+gnb()  { git new-branch "$@"; }
 gp()   { git pull "$@"; }
 gr()   { git rebase "$@"; }
 gs()   { git status "$@"; }
@@ -121,15 +123,11 @@ gcb() {
 }
 
 gbase() {
-  gmb `gcb` origin/master
-}
-
-grev() {
-  gl | grep Cr-Commit-Position | head -n1 | sed -E 's/.*\{#(.*+)\}.*/\1/g'
+  gmb `gcb` origin
 }
 
 gtry() {
-  g cl try -r `grev`
+  g cl try
 }
 
 ghide() {
@@ -307,4 +305,8 @@ gfc() {
     | grep '^\[branch ' \
     | tail -n1 \
     | sed -E 's/\[branch "(.*)"\].*/\1/'
+}
+
+jsonp() {
+  echo "$1" | python -m json.tool
 }
