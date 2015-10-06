@@ -180,14 +180,6 @@ gchr() {
   gr "$oldBranch"
 }
 
-crb() {
-  crclang "$@"
-}
-
-crbf() {
-  crb -f "$@"
-}
-
 crt() {
   target="$1"
   filter="$2"
@@ -227,35 +219,6 @@ crbr() {
   shift
 
   crclang "$testname" && "b/$testname" "$@"
-}
-
-po() {
-  old_dir=`pwd`
-  if [ -d "$1" ]; then
-    cd "$1"
-  elif [ -f "$1" ]; then
-    cd `dirname "$1"`
-  else
-    echo "Couldn't find file or directory $1"
-    return 1
-  fi
-
-  print_owners() {
-    if [ -f OWNERS ]; then
-      echo "=== `pwd`"
-      cat OWNERS
-      echo
-    fi
-  }
-
-  while [ `pwd` != "$old_dir" -a `pwd` != / ]; do
-    print_owners
-    cd ..
-  done
-  print_owners
-
-  unset print_owners
-  cd "$old_dir"
 }
 
 greplace() {
@@ -310,3 +273,68 @@ gfc() {
 jsonp() {
   echo "$1" | python -m json.tool
 }
+
+#
+# Chromium
+#
+
+po() {
+  old_dir=`pwd`
+  if [ -d "$1" ]; then
+    cd "$1"
+  elif [ -f "$1" ]; then
+    cd `dirname "$1"`
+  else
+    echo "Couldn't find file or directory $1"
+    return 1
+  fi
+
+  print_owners() {
+    if [ -f OWNERS ]; then
+      echo "=== `pwd`"
+      cat OWNERS
+      echo
+    fi
+  }
+
+  while [ `pwd` != "$old_dir" -a `pwd` != / ]; do
+    print_owners
+    cd ..
+  done
+  print_owners
+
+  unset print_owners
+  cd "$old_dir"
+}
+
+crb() {
+  version="$1"
+  if [ "$version" == '-r' ]; then
+    dir='gnr'
+  elif [ "$version" == '-d' ]; then
+    dir='gnd'
+  else
+    dir="$version"
+  fi
+  shift 1
+  targets="$@"
+  if [ -z "$targets" ]; then
+    targets='all'
+  fi
+  #${GOMA_DIR}/goma_ctl.py ensure_start
+  ninja -C "out/${dir}" "$targets" -j500
+}
+
+gnr() {
+  crb -r "$@"
+}
+
+gnd() {
+  crb -d "$@"
+}
+
+gsync() {
+  gclient sync -n
+}
+
+export GOMA_DIR=${HOME}/goma
