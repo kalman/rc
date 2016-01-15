@@ -29,7 +29,6 @@ __hostname() {
 }
 export PS1='\[\033[01;32m\]# $(__hostname)\[\033[01;34m\] \w \[\033[31m\]$(__git_ps1 "(%s)")\n\[\033[01;32m\]> \[\033[00m\]'
 
-export GOROOT="$HOME/local/go"
 export EDITOR="vim"
 export SVN_LOG_EDITOR="$EDITOR"
 export CHROME_DEVEL_SANDBOX="/usr/local/sbin/chrome-devel-sandbox"
@@ -37,9 +36,10 @@ export CHROME_DEVEL_SANDBOX="/usr/local/sbin/chrome-devel-sandbox"
 export PATH="$HOME/local/bin:$PATH"
 export PATH="$HOME/local/rc_scripts:$PATH"
 export PATH="$HOME/local/depot_tools:$PATH"
-export PATH="$GOROOT/bin:$PATH"
+export PATH="$HOME/local/npm-global/bin:$PATH"
 export PATH="$HOME/goma:$PATH"
 export PATH="/usr/bin:$PATH"
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
 #
 # General
@@ -65,6 +65,16 @@ vl() {
 }
 
 #
+# Go
+#
+
+export GOPATH="$HOME/src/go"
+
+cdg() {
+  c "$GOPATH/src"
+}
+
+#
 # Git
 #
 
@@ -87,7 +97,7 @@ complete -o default -o nospace -F _git_rebase gr
 
 g()    { git "$@"; }
 ga()   { git add "$@"; }
-gb()   { git branch "$@" | grep -v '^  __' | grep -v ' master$'; }
+gb()   { git branch "$@"; }
 gbD()  {
   read -p 'Are you sure? [y/N] ' -n1 READ;
   if [ "$READ" == 'y' ]; then git branch -D "$@"; fi
@@ -123,7 +133,7 @@ gcb() {
 }
 
 gbase() {
-  gmb `gcb` origin
+  gmb `gcb` master
 }
 
 gtry() {
@@ -204,9 +214,13 @@ gsquash() {
   gC
 }
 
-export CRDIR="$HOME/chromium"
 cdc() {
-  c "${CRDIR}${1}"
+  dir="${HOME}/chromium${1}"
+  if [ ! -d "$dir" ]; then
+    echo "Chromium directory not found at $dir"
+    return 1
+  fi
+  c "$dir"
 }
 
 crbr() {
@@ -253,9 +267,7 @@ gfindconfigpath() {
 }
 
 gh() {
-  grep '\[branch "' "`gfindconfigpath`" \
-    | sed 's/^.*"\(.*\)".*$/\1/' \
-    | grep -v '^__'
+  git for-each-ref --sort=-committerdate refs/heads --format='%(refname:short)'
 }
 
 gfc() {

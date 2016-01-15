@@ -1,9 +1,15 @@
-[user]
-	name = Benjamin Kalman
-	email = kalman@chromium.org
 [color]
 	ui = true
 [core]
 	autocrlf = false
 	filemode = false
 	deltaBaseCacheLimit = 1G
+[push]
+	default = matching
+[filter "lfs"]
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+	required = true
+[user]
+	name = Benjamin Kalman
+	email = btkalman@gmail.com
