@@ -1,30 +1,35 @@
+execute pathogen#infect()
+
 syntax on
 filetype indent on
 filetype plugin on
 colorscheme ben
 
 set autoindent
+set autoindent
+set backspace=indent,eol,start
+set breakindent
+set expandtab
 set hlsearch
+set indentexpr=
+set lbr
 set modeline
+set nocindent
 set number
 set ruler
-set tags=tags
-set smarttab
-set tabstop=2
 set shiftwidth=2
+set showbreak=~
+set smarttab
 set softtabstop=2
-set expandtab
-set backspace=indent,eol,start
-set nocindent
-set autoindent
-set wildmode=longest,list,full
+set tabstop=2
+set tags=tags
 set wildmenu
-set indentexpr=
+set wildmode=longest,list,full
 
-"map j gj
-"map k gk
-"map ^ g^
-"map $ g$
+map j gj
+map k gk
+map ^ g^
+map $ g$
 map gr gT
 map m :cnext<CR>
 map e :e 

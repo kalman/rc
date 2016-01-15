@@ -1,1 +1,0 @@
-/Users/kalman/local/go/misc/vim/syntax/go.vim
