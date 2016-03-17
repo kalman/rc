@@ -69,6 +69,7 @@ vl() {
 #
 
 export GOPATH="$HOME/src/go"
+export GO15VENDOREXPERIMENT=1
 
 cdg() {
   c "$GOPATH/src"
@@ -347,6 +348,10 @@ gnd() {
 
 gsync() {
   gclient sync -n
+}
+
+gos() {
+  go list ./... 2>/dev/null | grep -v /vendor/
 }
 
 export GOMA_DIR=${HOME}/goma

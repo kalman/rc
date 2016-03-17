@@ -1,8 +1,8 @@
 RC := $(HOME)/.rc
 
-.PHONY: all profile vim gdbinit gitconfig rc_scripts
+.PHONY: all profile vim gdbinit gitconfig rc_scripts screenrc
 
-all: profile vim gdbinit gitconfig rc_scripts
+all: profile vim gdbinit gitconfig rc_scripts screenrc
 
 profile:
 	rm -f $(HOME)/.profile
@@ -26,3 +26,6 @@ rc_scripts:
 	mkdir -p $(HOME)/local
 	rm -f $(HOME)/local/rc_scripts
 	ln -s $(RC)/scripts $(HOME)/local/rc_scripts
+
+screenrc:
+	ln -f $(RC)/screenrc $(HOME)/.screenrc
