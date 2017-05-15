@@ -48,6 +48,9 @@ map <c-m> :wn<CR>
 map <c-k> <c-y>
 map \ :noh<cr>
 
+" For vim-go
+let g:go_autodetect_gopath = 0
+
 " Taken from :help [I
 map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 
