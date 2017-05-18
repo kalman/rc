@@ -48,8 +48,15 @@ map <c-m> :wn<CR>
 map <c-k> <c-y>
 map \ :noh<cr>
 
-" For vim-go
+" For go
 let g:go_autodetect_gopath = 0
+
+" For javascript
+let g:jsx_ext_required = 0
+let g:javascript_plugin_flow = 1
+let g:flow#autoclose = 1
+let g:flow#enable = 0
+command Flow call flow#typecheck()
 
 " Taken from :help [I
 map <F5> [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>

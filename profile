@@ -79,6 +79,12 @@ cdg() {
 }
 
 #
+# Attic
+#
+
+export PATH="$GOPATH/src/github.com/attic-labs/attic/fe/react-native/Attic/node_modules/.bin:$PATH"
+
+#
 # Git
 #
 
@@ -88,11 +94,11 @@ complete -o default -o nospace -F _git_branch changed
 complete -o default -o nospace -F _git_branch cherry-pick
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_branch gcb
-complete -o default -o nospace -F _git_branch ghide
 complete -o default -o nospace -F _git_checkout gch
 complete -o default -o nospace -F _git_checkout gchr
 complete -o default -o nospace -F _git_diff gd
 complete -o default -o nospace -F _git_diff gdt
+complete -o default -o nospace -F _git_diff gdno
 complete -o default -o nospace -F _git_diff gdns
 complete -o default -o nospace -F _git_diff gds
 complete -o default -o nospace -F _git_merge_base gmb
@@ -109,19 +115,25 @@ gbD()  {
 gc()   { git commit "$@"; }
 gcaa() { gc -a --amend; }
 gch()  { git checkout "$@"; }
+gcho() { git checkout origin/master "$@"; }
 gcp()  { git cherry-pick "$@"; }
 gd()   { git diff "$@"; }
+gdno() { git diff --name-only "$@"; }
 gdns() { git diff --name-status "$@"; }
+gdo()  { git diff origin/master "$@"; }
 gds()  { git diff --stat "$@"; }
 gdt()  { git difftool "$@"; }
+gfa()  { git fetch --all --verbose "$@"; }
 gg()   { git grep "$@"; }
 gl()   { git log "$@"; }
 gls()  { git ls-files "$@"; }
 gm()   { git merge "$@"; }
+gmo()  { git merge origin/master "$@"; }
 gmb()  { git merge-base "$@"; }
-gnb()  { git new-branch "$@"; }
 gp()   { git pull "$@"; }
+gpu()  { git push "$@"; }
 gr()   { git rebase "$@"; }
+gro()  { git rebase origin/master "$@"; }
 gs()   { git status "$@"; }
 
 unmerged() {
@@ -137,11 +149,7 @@ gcb() {
 }
 
 gbase() {
-  gmb `gcb` master
-}
-
-gtry() {
-  g cl try
+  gmb `gcb` origin/master
 }
 
 ghide() {
@@ -154,33 +162,12 @@ ghide() {
   done
 }
 
-gclean() {
-  current_date=`date +%F | tr -d -`
-  for branch in `git branch | grep -E '__[0-9-]+__'`; do
-    branch_date=`echo "$branch" | grep -Eo '__[0-9-]+__' | tr -d _-`
-    if [ $branch_date -lt $(( $current_date - 100 )) ]; then
-      read -N 1 -p "Delete $branch [N/y] "
-      echo
-      if [ "$REPLY" = y ]; then
-        git branch -D "$branch"
-        echo
-      fi
-    fi
-  done
-
-  read -N 1 -p "Run \"git gc\" [N/y] "
-  echo
-  if [ "$REPLY" = y ]; then
-    git gc
-  fi
-}
-
 changed() {
   base="$1"
   if [ -z "$base" ]; then
     base=`gbase`
   fi
-  gdns "$base" | cut -f2
+  gdno "$base"
 }
 
 gchr() {
@@ -195,7 +182,7 @@ gchr() {
 }
 
 gf() {
-  gls "*/$1"
+  gls "$1" "*/$1"
 }
 
 greplace() {
@@ -216,6 +203,22 @@ gclu() {
 
 gh() {
   git for-each-ref --sort=committerdate refs/heads --format='%(refname:short)'
+}
+
+groot() {
+  oldpwd=`pwd`
+  while [ `pwd` != / ]; do
+    if [ -d .git ]; then
+      pwd
+      break
+    fi
+    cd ..
+  done
+  cd "$oldpwd"
+}
+
+gnb() {
+  gch -b "$1" --track origin/master
 }
 
 jsonp() {
