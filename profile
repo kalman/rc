@@ -61,13 +61,6 @@ vl() {
 }
 
 #
-# Android
-#
-
-export ANDROID_HOME="${HOME}/Library/Android/sdk"
-export PATH="${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools"
-
-#
 # Go
 #
 
@@ -79,10 +72,15 @@ cdg() {
 }
 
 #
-# Attic
+# Quip
 #
 
-export PATH="$GOPATH/src/github.com/attic-labs/attic/fe/react-native/Attic/node_modules/.bin:$PATH"
+export PATH="$PATH:$HOME/android-sdk-macosx/emulator"
+export PATH="$PATH:$HOME/android-sdk-macosx/tools"
+export PATH="$PATH:$HOME/android-sdk-macosx/tools/bin"
+export PATH="$PATH:$HOME/android-sdk-macosx/platform-tools"
+export PATH="$PATH:$HOME/quip/android/tools"
+export ANDROID_HOME="$HOME/android-sdk-macosx"
 
 #
 # Git
@@ -131,17 +129,19 @@ gm()   { git merge "$@"; }
 gmo()  { git merge origin/master "$@"; }
 gmb()  { git merge-base "$@"; }
 gp()   { git pull "$@"; }
+gpr()  { git pull --rebase --autostash "$@"; }
 gpu()  { git push "$@"; }
 gr()   { git rebase "$@"; }
 gro()  { git rebase origin/master "$@"; }
 gs()   { git status "$@"; }
+gpgp() { git push origin "$(gcb)" "$@"; }
 
 unmerged() {
   git status -s | grep '^[AUD][AUD] ' | cut -f2 -d' '
 }
 
 gC() {
-  gc -m `gcb` "$@"
+  gc -m "$(gcb)" "$@"
 }
 
 gcb() {
@@ -149,7 +149,7 @@ gcb() {
 }
 
 gbase() {
-  gmb `gcb` origin/master
+  gmb "$(gcb)" origin/master
 }
 
 ghide() {
@@ -171,7 +171,7 @@ changed() {
 }
 
 gchr() {
-  oldBranch=`gcb`
+  oldBranch="$(gcb)"
   branch="$1"
   if [ -z "$branch" ]; then
     echo "ERROR: no branch supplied"

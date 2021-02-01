@@ -6,10 +6,11 @@
 	deltaBaseCacheLimit = 1G
 [push]
 	default = matching
+	followTags = true
 [filter "lfs"]
 	clean = git-lfs clean %f
 	smudge = git-lfs smudge %f
 	required = true
 [user]
 	name = Benjamin Kalman
-	email = btkalman@gmail.com
+	email = bkalman@quip.com
